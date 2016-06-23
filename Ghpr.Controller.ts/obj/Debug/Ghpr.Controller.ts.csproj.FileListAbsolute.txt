@@ -1,0 +1,6 @@
+C:\Users\Evgeniy_Kosjakov\Documents\GitHub\Ghpr.Controller.ts\Ghpr.Controller.ts\bin\Ghpr.Controller.ts.dll.config
+C:\Users\Evgeniy_Kosjakov\Documents\GitHub\Ghpr.Controller.ts\Ghpr.Controller.ts\bin\Ghpr.Controller.ts.dll
+C:\Users\Evgeniy_Kosjakov\Documents\GitHub\Ghpr.Controller.ts\Ghpr.Controller.ts\bin\Ghpr.Controller.ts.pdb
+C:\Users\Evgeniy_Kosjakov\Documents\GitHub\Ghpr.Controller.ts\Ghpr.Controller.ts\obj\Debug\Ghpr.Controller.ts.csprojResolveAssemblyReference.cache
+C:\Users\Evgeniy_Kosjakov\Documents\GitHub\Ghpr.Controller.ts\Ghpr.Controller.ts\obj\Debug\Ghpr.Controller.ts.dll
+C:\Users\Evgeniy_Kosjakov\Documents\GitHub\Ghpr.Controller.ts\Ghpr.Controller.ts\obj\Debug\Ghpr.Controller.ts.pdb

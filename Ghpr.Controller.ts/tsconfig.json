@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "noEmitOnError": true,
+    "removeComments": true,
+    "sourceMap": true,
+    "outFile": "./report/src/js/ghpr.controller.js",
+    "target": "es6"
+  },
+  "files": [
+        "controller/interfaces/IRunSummary.ts",
+        "controller/interfaces/IRun.ts",
+        "controller/interfaces/ITestEvent.ts",
+        "controller/interfaces/ITestScreenshot.ts",
+        "controller/interfaces/ITestRun.ts",
+        "controller/enums/TestResult.ts"
+  ]
+}
