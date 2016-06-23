@@ -28,6 +28,7 @@
     <Content Include="report\runs\index.html" />
     <Content Include="report\src\js\ghpr.controller.js" />
     <Content Include="report\src\js\jquery-1.11.0.min.js" />
+    <Content Include="report\src\js\plotly.min.js" />
     <Content Include="report\src\js\tablesort.min.js" />
     <Content Include="report\src\octicons\octicons.css" />
     <Content Include="report\src\octicons\octicons.svg" />
@@ -38,6 +39,8 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="app.ts" />
+    <TypeScriptCompile Include="controller\common\JsonLoader.ts" />
+    <TypeScriptCompile Include="controller\enums\PageType.ts" />
     <TypeScriptCompile Include="controller\enums\TestResult.ts" />
     <TypeScriptCompile Include="controller\interfaces\IRun.ts" />
     <TypeScriptCompile Include="controller\interfaces\IRunSummary.ts" />

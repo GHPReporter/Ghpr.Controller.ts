@@ -7,4 +7,10 @@ var TestResult;
     TestResult[TestResult["Inconclusive"] = 4] = "Inconclusive";
     TestResult[TestResult["Unknown"] = 5] = "Unknown";
 })(TestResult || (TestResult = {}));
+var PageType;
+(function (PageType) {
+    PageType[PageType["TestRunsPage"] = 0] = "TestRunsPage";
+    PageType[PageType["TestRunPage"] = 1] = "TestRunPage";
+    PageType[PageType["TestPage"] = 2] = "TestPage";
+})(PageType || (PageType = {}));
 //# sourceMappingURL=ghpr.controller.js.map

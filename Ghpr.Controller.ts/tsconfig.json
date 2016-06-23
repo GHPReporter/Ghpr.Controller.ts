@@ -13,6 +13,7 @@
         "controller/interfaces/ITestEvent.ts",
         "controller/interfaces/ITestScreenshot.ts",
         "controller/interfaces/ITestRun.ts",
-        "controller/enums/TestResult.ts"
+        "controller/enums/TestResult.ts",
+        "controller/enums/PageType.ts"
   ]
 }
