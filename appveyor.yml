@@ -1,0 +1,13 @@
+before_build:
+    - nuget restore Ghpr.Controller.ts/Ghpr.Controller.ts.sln
+
+  build_script: 
+    - msbuild Ghpr.Controller.ts/Ghpr.Controller.ts.sln /p:Configuration=Release /t:Rebuild
+  
+  test:
+    assemblies:
+      - '**\*TestsExample.dll'
+      - '**\*TestsExample2.dll'
+    categories:
+      only:
+        - SuccessCategory
