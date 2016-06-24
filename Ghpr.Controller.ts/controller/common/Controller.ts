@@ -1,6 +1,11 @@
 ﻿///<reference path="JsonLoader.ts"/>
+///<reference path="FilesGetter.ts"/>
 
-function logRun(guid: string, type: PageType) {
-    const jl = new JsonLoader();
-    console.log(jl.getRun(guid,  type));
+function loadRun(guid: string) {
+    RunPageUpdater.updateRunPage(guid);
+}
+
+function loadFirstRun(guid: string) {
+    const runs = FilesGetter.getRuns();
+    RunPageUpdater.updateRunPage(runs[1]);
 }

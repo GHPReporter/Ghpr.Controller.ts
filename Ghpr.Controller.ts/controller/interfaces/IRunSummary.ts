@@ -3,7 +3,7 @@
     success: number;
     errors: number;
     failures: number;
-    inconcusive: number;
+    inconclusive: number;
     ignored: number;
     unknown: number;
 }

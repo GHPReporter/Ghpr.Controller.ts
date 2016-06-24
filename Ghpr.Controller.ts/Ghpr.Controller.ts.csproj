@@ -38,8 +38,12 @@
     <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="controller\common\Color.ts" />
     <TypeScriptCompile Include="controller\common\Controller.ts" />
+    <TypeScriptCompile Include="controller\common\DateFormatter.ts" />
+    <TypeScriptCompile Include="controller\common\FilesGetter.ts" />
     <TypeScriptCompile Include="controller\common\JsonLoader.ts" />
+    <TypeScriptCompile Include="controller\common\RunPageUpdater.ts" />
     <TypeScriptCompile Include="controller\enums\PageType.ts" />
     <TypeScriptCompile Include="controller\enums\TestResult.ts" />
     <TypeScriptCompile Include="controller\interfaces\IRun.ts" />
@@ -64,7 +68,6 @@
       <DependentUpon>web.config</DependentUpon>
     </None>
   </ItemGroup>
-  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
   </PropertyGroup>

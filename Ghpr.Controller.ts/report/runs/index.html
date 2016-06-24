@@ -14,7 +14,10 @@
     <link rel="stylesheet" type="text/css" href="./../src/style/primer.css" />
     <link rel="stylesheet" type="text/css" href="./../src/style/github.css" />
 </head>
-<body onload="logRun('88460e79-63c1-43d6-98cd-895867ca30c6', PageType.TestRunPage);">
+<body>
+<script type="text/javascript">
+    loadRun('88460e79-63c1-43d6-98cd-895867ca30c6');
+</script>
 <div class="border-bottom p-3 mb-3">
     <div class="container">
         <div style="text-align: center;">
@@ -38,8 +41,8 @@
                 </h2>
                 <div class="border border-0 p-3 mb-3">
                     <ul>
-                        <li id="startDateTime">Start datetime: </li>
-                        <li id="finishDateTime">Finish datetime: </li>
+                        <li id="start">Start datetime: </li>
+                        <li id="finish">Finish datetime: </li>
                         <li id="duration">Duration: </li>
                     </ul>
                 </div>
@@ -56,6 +59,7 @@
                         <li id="failed">Failures: </li>
                         <li id="inconclusive">Inconclusive: </li>
                         <li id="ignored">Ignored: </li>
+                        <li id="unknown">Unknown: </li>
                     </ul>
                 </div>
             </div>
