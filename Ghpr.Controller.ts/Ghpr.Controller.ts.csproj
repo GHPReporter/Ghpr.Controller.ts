@@ -38,7 +38,6 @@
     <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="app.ts" />
     <TypeScriptCompile Include="controller\common\Controller.ts" />
     <TypeScriptCompile Include="controller\common\JsonLoader.ts" />
     <TypeScriptCompile Include="controller\enums\PageType.ts" />

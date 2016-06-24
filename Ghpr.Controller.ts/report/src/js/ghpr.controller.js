@@ -49,12 +49,12 @@ class JsonLoader {
         req.send(null);
     }
     getRun(runGuid, pt) {
-        let r;
-        this.loadJson(runGuid, pt, function (response) {
-            console.log(response);
-            r = JSON.parse(response);
+        let run;
+        this.loadJson(runGuid, pt, (response) => {
+            console.log("r: " + response);
+            run = JSON.parse(response);
         });
-        return r;
+        return run;
     }
     loadRun(runGuid, pt) {
         let run;

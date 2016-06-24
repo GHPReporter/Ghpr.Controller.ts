@@ -42,12 +42,12 @@ class JsonLoader {
     }
 
     getRun(runGuid: string, pt: PageType): IRun {
-        let r: IRun;
-        this.loadJson(runGuid, pt, function (response: string) {
-            console.log(response);
-            r = JSON.parse(response);
+        let run: IRun;
+        this.loadJson(runGuid, pt, (response: string) => {
+            console.log("r: " + response);
+            run = JSON.parse(response);
         });
-        return r;
+        return run;
     }
 
     loadRun(runGuid: string, pt: PageType): IRun {
