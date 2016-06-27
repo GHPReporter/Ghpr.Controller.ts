@@ -13,6 +13,28 @@ var PageType;
     PageType[PageType["TestRunPage"] = 1] = "TestRunPage";
     PageType[PageType["TestPage"] = 2] = "TestPage";
 })(PageType || (PageType = {}));
+class UrlHelper {
+    static insertParam(key, value) {
+        const paramsPart = document.location.search.substr(1);
+        if (paramsPart === "") {
+            window.history.pushState("", "", `?${key}=${value}`);
+        }
+        else {
+            const params = paramsPart.split("&");
+            console.log("paramsC: " + params.length);
+            for (let p of params) {
+                console.log(`p: ${p}`);
+                const kv = p.split("=");
+                const k = kv[0];
+                let v = kv[1];
+                console.log(`k: ${k}, v: ${v}`);
+                if (k === key) {
+                    v = value;
+                }
+            }
+        }
+    }
+}
 class DateFormatter {
     static format(date) {
         const year = `${date.getFullYear()}`;
@@ -51,21 +73,24 @@ Color.inconclusive = "#D6FAF7";
 Color.unknown = "#bdbdbd";
 class RunPageUpdater {
     static updateTime(run) {
-        document.getElementById("start").innerHTML += DateFormatter.format(run.start);
-        document.getElementById("finish").innerHTML += DateFormatter.format(run.finish);
-        document.getElementById("duration").innerHTML += DateFormatter.diff(run.start, run.finish);
+        document.getElementById("start").innerHTML = `Start datetime: ${DateFormatter.format(run.runInfo.start)}`;
+        document.getElementById("finish").innerHTML = `Finish datetime: ${DateFormatter.format(run.runInfo.finish)}`;
+        document.getElementById("duration").innerHTML = `Duration: ${DateFormatter.diff(run.runInfo.start, run.runInfo.finish)}`;
+    }
+    static updateName(run) {
+        document.getElementById("run-name").innerHTML = run.name;
     }
     static updateSummary(run) {
         const s = run.summary;
-        document.getElementById("total").innerHTML += s.total;
-        document.getElementById("passed").innerHTML += s.success;
-        document.getElementById("broken").innerHTML += s.errors;
-        document.getElementById("failed").innerHTML += s.failures;
-        document.getElementById("inconclusive").innerHTML += s.inconclusive;
-        document.getElementById("ignored").innerHTML += s.ignored;
-        document.getElementById("unknown").innerHTML += s.unknown;
+        document.getElementById("total").innerHTML = `Total: ${s.total}`;
+        document.getElementById("passed").innerHTML = `Success: ${s.success}`;
+        document.getElementById("broken").innerHTML = `Errors: ${s.errors}`;
+        document.getElementById("failed").innerHTML = `Failures: ${s.failures}`;
+        document.getElementById("inconclusive").innerHTML = `Inconclusive: ${s.inconclusive}`;
+        document.getElementById("ignored").innerHTML = `Ignored: ${s.ignored}`;
+        document.getElementById("unknown").innerHTML = `Unknown: ${s.unknown}`;
         const pieDiv = document.getElementById("summary-pie");
-        Plotly.plot(pieDiv, [
+        Plotly.newPlot(pieDiv, [
             {
                 values: [s.success, s.errors, s.failures, s.inconclusive, s.ignored, s.unknown],
                 labels: ["Passed", "Broken", "Failed", "Inconclusive", "Ignored", "Unknown"],
@@ -94,12 +119,49 @@ class RunPageUpdater {
     static updateRunPage(runGuid) {
         let run;
         var loader = new JsonLoader();
-        loader.loadJson(runGuid, PageType.TestRunPage, (response) => {
+        loader.loadRunJson(runGuid, PageType.TestRunPage, (response) => {
             run = JSON.parse(response, loader.reviveRun);
+            UrlHelper.insertParam("runGuid", run.runInfo.guid);
             RunPageUpdater.updateTime(run);
             RunPageUpdater.updateSummary(run);
+            RunPageUpdater.updateName(run);
         });
         return run;
+    }
+    static loadRun(index) {
+        let runInfos;
+        var loader = new JsonLoader();
+        loader.loadRunsJson((response) => {
+            runInfos = JSON.parse(response, loader.reviveRun);
+            this.runsCount = runInfos.length;
+            this.updateRunPage(runInfos[index].guid);
+        });
+    }
+    static loadFirst() {
+        this.currentRun = 0;
+        this.loadRun(this.currentRun);
+    }
+    static loadPrev() {
+        if (this.currentRun === 0) {
+            return;
+        }
+        else {
+            this.currentRun -= 1;
+            this.loadRun(this.currentRun);
+        }
+    }
+    static loadNext() {
+        if (this.currentRun === this.runsCount - 1) {
+            return;
+        }
+        else {
+            this.currentRun += 1;
+            this.loadRun(this.currentRun);
+        }
+    }
+    static loadCurrent() {
+        this.currentRun = this.runsCount - 1;
+        this.loadRun(this.currentRun);
     }
 }
 class JsonLoader {
@@ -115,8 +177,15 @@ class JsonLoader {
                 return "";
         }
     }
-    loadJson(runGuid, pt, callback) {
+    loadRunJson(runGuid, pt, callback) {
         const path = this.getRunPath(pt, runGuid);
+        this.loadJson(path, callback);
+    }
+    loadRunsJson(callback) {
+        const path = "./runs.json";
+        this.loadJson(path, callback);
+    }
+    loadJson(path, callback) {
         const req = new XMLHttpRequest();
         req.overrideMimeType("application/json");
         req.open("get", path, true);
@@ -124,7 +193,7 @@ class JsonLoader {
             if (req.readyState === 4)
                 if (req.status !== 200) {
                     console
-                        .log(`Error while loading IRun .json data! Request status: ${req.status} : ${req.statusText}`);
+                        .log(`Error while loading .json data! Request status: ${req.status} : ${req.statusText}`);
                 }
                 else {
                     callback(req.responseText);
@@ -132,7 +201,7 @@ class JsonLoader {
         };
         req.timeout = 2000;
         req.ontimeout = () => {
-            console.log(`Timeout while loading IRun .json data! Request status: ${req.status} : ${req.statusText}`);
+            console.log(`Timeout while loading .json data! Request status: ${req.status} : ${req.statusText}`);
         };
         req.send(null);
     }
@@ -142,16 +211,10 @@ class JsonLoader {
         return value;
     }
 }
-class FilesGetter {
-    static getRuns() {
-        return null;
-    }
-}
 function loadRun(guid) {
     RunPageUpdater.updateRunPage(guid);
 }
-function loadFirstRun(guid) {
-    const runs = FilesGetter.getRuns();
-    RunPageUpdater.updateRunPage(runs[1]);
+function loadFirstRun() {
+    RunPageUpdater.loadFirst();
 }
 //# sourceMappingURL=ghpr.controller.js.map

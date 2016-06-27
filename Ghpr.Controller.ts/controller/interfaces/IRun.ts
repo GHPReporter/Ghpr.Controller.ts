@@ -1,10 +1,9 @@
 ﻿///<reference path="./IRunSummary.ts"/>
+///<reference path="./IRunInfo.ts"/>
 
 interface IRun {
     testRunFiles: Array<string>;
-    guid: string;
+    runInfo: IRunInfo;
     summary: IRunSummary;
     name: string;
-    start: Date;
-    finish: Date;
 }

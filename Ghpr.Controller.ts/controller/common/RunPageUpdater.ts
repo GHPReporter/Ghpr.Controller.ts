@@ -1,30 +1,40 @@
-﻿///<reference path="./../interfaces/IRun.ts"/>
+﻿///<reference path="./../interfaces/IRunInfo.ts"/>
+///<reference path="./../interfaces/IRun.ts"/>
 ///<reference path="./../enums/PageType.ts"/>
 ///<reference path="./JsonLoader.ts"/>
+///<reference path="./UrlHelper.ts"/>
 ///<reference path="./DateFormatter.ts"/>
 ///<reference path="./Color.ts"/>
 
 declare var Plotly: any;
 
 class RunPageUpdater {
+
+    static currentRun: number;
+    static runsCount: number; 
+
     static updateTime(run: IRun): void {
-        document.getElementById("start").innerHTML += DateFormatter.format(run.start);
-        document.getElementById("finish").innerHTML += DateFormatter.format(run.finish);
-        document.getElementById("duration").innerHTML += DateFormatter.diff(run.start, run.finish);
+        document.getElementById("start").innerHTML = `Start datetime: ${DateFormatter.format(run.runInfo.start)}`;
+        document.getElementById("finish").innerHTML = `Finish datetime: ${DateFormatter.format(run.runInfo.finish)}`;
+        document.getElementById("duration").innerHTML = `Duration: ${DateFormatter.diff(run.runInfo.start, run.runInfo.finish)}`;
+    }
+
+    static updateName(run: IRun): void {
+        document.getElementById("run-name").innerHTML = run.name;
     }
 
     static updateSummary(run: IRun): void {
         const s = run.summary;
-        document.getElementById("total").innerHTML += s.total;
-        document.getElementById("passed").innerHTML += s.success;
-        document.getElementById("broken").innerHTML += s.errors;
-        document.getElementById("failed").innerHTML += s.failures;
-        document.getElementById("inconclusive").innerHTML += s.inconclusive;
-        document.getElementById("ignored").innerHTML += s.ignored;
-        document.getElementById("unknown").innerHTML += s.unknown;
-
+        document.getElementById("total").innerHTML = `Total: ${s.total}`;
+        document.getElementById("passed").innerHTML = `Success: ${s.success}`;
+        document.getElementById("broken").innerHTML = `Errors: ${s.errors}`;
+        document.getElementById("failed").innerHTML = `Failures: ${s.failures}`;
+        document.getElementById("inconclusive").innerHTML = `Inconclusive: ${s.inconclusive}`;
+        document.getElementById("ignored").innerHTML = `Ignored: ${s.ignored}`;
+        document.getElementById("unknown").innerHTML = `Unknown: ${s.unknown}`;
+        
         const pieDiv = document.getElementById("summary-pie");
-        Plotly.plot(pieDiv,
+        Plotly.newPlot(pieDiv,
         [
             {
                 values: [s.success, s.errors, s.failures, s.inconclusive, s.ignored, s.unknown],
@@ -56,11 +66,52 @@ class RunPageUpdater {
     static updateRunPage(runGuid: string): IRun {
         let run: IRun;
         var loader = new JsonLoader();
-        loader.loadJson(runGuid, PageType.TestRunPage, (response: string) => {
+        loader.loadRunJson(runGuid, PageType.TestRunPage, (response: string) => {
             run = JSON.parse(response, loader.reviveRun);
+            UrlHelper.insertParam("runGuid", run.runInfo.guid);
             RunPageUpdater.updateTime(run);
             RunPageUpdater.updateSummary(run);
+            RunPageUpdater.updateName(run);
         });
         return run;
+    }
+
+    static loadRun(index: number): void {
+        let runInfos: Array<IRunInfo>;
+        var loader = new JsonLoader();
+        loader.loadRunsJson((response: string) => {
+            runInfos = JSON.parse(response, loader.reviveRun);
+            this.runsCount = runInfos.length;
+            this.updateRunPage(runInfos[index].guid);
+        });
+    }
+
+    static loadFirst(): void {
+        this.currentRun = 0;
+        this.loadRun(this.currentRun);
+    }
+
+    static loadPrev(): void {
+        if (this.currentRun === 0) {
+            return;
+        }
+        else {
+            this.currentRun -= 1;
+            this.loadRun(this.currentRun);
+        }
+    }
+
+    static loadNext(): void {
+        if (this.currentRun === this.runsCount - 1) {
+            return;
+        } else {
+            this.currentRun += 1;
+            this.loadRun(this.currentRun);
+        }
+    }
+
+    static loadCurrent(): void {
+        this.currentRun = this.runsCount - 1;
+        this.loadRun(this.currentRun);
     }
 }

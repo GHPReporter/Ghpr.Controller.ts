@@ -41,12 +41,13 @@
     <TypeScriptCompile Include="controller\common\Color.ts" />
     <TypeScriptCompile Include="controller\common\Controller.ts" />
     <TypeScriptCompile Include="controller\common\DateFormatter.ts" />
-    <TypeScriptCompile Include="controller\common\FilesGetter.ts" />
     <TypeScriptCompile Include="controller\common\JsonLoader.ts" />
     <TypeScriptCompile Include="controller\common\RunPageUpdater.ts" />
+    <TypeScriptCompile Include="controller\common\UrlHelper.ts" />
     <TypeScriptCompile Include="controller\enums\PageType.ts" />
     <TypeScriptCompile Include="controller\enums\TestResult.ts" />
     <TypeScriptCompile Include="controller\interfaces\IRun.ts" />
+    <TypeScriptCompile Include="controller\interfaces\IRunInfo.ts" />
     <TypeScriptCompile Include="controller\interfaces\IRunSummary.ts" />
     <TypeScriptCompile Include="controller\interfaces\ITestEvent.ts" />
     <TypeScriptCompile Include="controller\interfaces\ITestRun.ts" />
@@ -56,11 +57,12 @@
     <Content Include="report\src\octicons\octicons.eot" />
     <Content Include="report\src\octicons\octicons.ttf" />
     <Content Include="report\src\octicons\octicons.woff" />
-    <Content Include="report\tests\test\test_20160622_201116590.json" />
-    <Content Include="report\tests\test\test_20160622_201345297.json" />
-    <Content Include="report\runs\run_88460e79-63c1-43d6-98cd-895867ca30c6.json" />
-    <Content Include="report\runs\run_f3d25bc8-ae9b-4840-9a4f-63acb5cff745.json" />
     <Content Include="tsconfig.json" />
+    <Content Include="report\runs\runs.json" />
+    <Content Include="report\runs\run_80588711-53c2-4b1c-9d50-ba0e80a3f381.json" />
+    <Content Include="report\runs\run_9253dc84-9a58-4441-a8a5-2fb2020770ec.json" />
+    <Content Include="report\tests\test\test_20160627_165346398.json" />
+    <Content Include="report\tests\test\test_20160627_165935877.json" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>

@@ -16,7 +16,7 @@
 </head>
 <body>
 <script type="text/javascript">
-    loadRun('88460e79-63c1-43d6-98cd-895867ca30c6');
+    RunPageUpdater.loadFirst();
 </script>
 <div class="border-bottom p-3 mb-3">
     <div class="container">
@@ -28,8 +28,21 @@
     </div>
 </div>
 <div class="container">
+    <div class="btn-group clearfix">
+        <button class="btn" type="button" onclick="RunPageUpdater.loadPrev();">
+            <span class="octicon octicon-arrow-left"></span>
+            Prev
+        </button>
+        <button class="btn" type="button"onclick="RunPageUpdater.loadCurrent();">
+            Current
+        </button>
+        <button class="btn" type="button" onclick="RunPageUpdater.loadNext();">
+            Next
+            <span class="octicon octicon-arrow-right"></span>
+        </button>
+    </div>
     <div class="border-bottom p-3 mb-3">
-        <h1>
+        <h1 id="run-name">
             Test run report
         </h1>
     </div>

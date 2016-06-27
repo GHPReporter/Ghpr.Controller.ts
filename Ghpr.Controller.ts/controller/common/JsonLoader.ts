@@ -16,8 +16,17 @@ class JsonLoader {
         }
     }
 
-    loadJson(runGuid: string, pt: PageType, callback: Function): void {
+    loadRunJson(runGuid: string, pt: PageType, callback: Function): void {
         const path = this.getRunPath(pt, runGuid);
+        this.loadJson(path, callback);
+    }
+
+    loadRunsJson(callback: Function): void {
+        const path = "./runs.json";
+        this.loadJson(path, callback);
+    }
+
+    loadJson(path: string, callback: Function): void {
         const req = new XMLHttpRequest();
         req.overrideMimeType("application/json");
         req.open("get", path, true);
@@ -25,17 +34,16 @@ class JsonLoader {
             if (req.readyState === 4)
                 if (req.status !== 200) {
                     console
-                        .log(`Error while loading IRun .json data! Request status: ${req.status} : ${req.statusText}`);
+                        .log(`Error while loading .json data! Request status: ${req.status} : ${req.statusText}`);
                 } else {
                     callback(req.responseText);
                 }
         }
         req.timeout = 2000;
         req.ontimeout = () => {
-            console.log(`Timeout while loading IRun .json data! Request status: ${req.status} : ${req.statusText}`);
+            console.log(`Timeout while loading .json data! Request status: ${req.status} : ${req.statusText}`);
         };
         req.send(null);
-
     }
 
     reviveRun(key: any, value: any): any {
