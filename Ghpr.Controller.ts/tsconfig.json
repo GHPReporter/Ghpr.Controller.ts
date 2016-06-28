@@ -9,7 +9,7 @@
   },
   "files": [
         "controller/interfaces/IRunSummary.ts",
-        "controller/interfaces/IRunInfo.ts",
+        "controller/interfaces/IItemInfo.ts",
         "controller/interfaces/IRun.ts",
         "controller/interfaces/ITestEvent.ts",
         "controller/interfaces/ITestScreenshot.ts",

@@ -1,4 +1,4 @@
-﻿///<reference path="./../interfaces/IRunInfo.ts"/>
+﻿///<reference path="./../interfaces/IItemInfo.ts"/>
 ///<reference path="./../interfaces/IRun.ts"/>
 ///<reference path="./../enums/PageType.ts"/>
 ///<reference path="./JsonLoader.ts"/>
@@ -77,7 +77,7 @@ class RunPageUpdater {
     }
 
     static loadRun(index: number = undefined): void {
-        let runInfos: Array<IRunInfo>;
+        let runInfos: Array<IItemInfo>;
         var loader = new JsonLoader();
         loader.loadRunsJson((response: string) => {
             runInfos = JSON.parse(response, loader.reviveRun);
@@ -96,7 +96,7 @@ class RunPageUpdater {
             this.loadRun();
             return;
         }
-        let runInfos: Array<IRunInfo>;
+        let runInfos: Array<IItemInfo>;
         var loader = new JsonLoader();
         loader.loadRunsJson((response: string) => {
             runInfos = JSON.parse(response, loader.reviveRun);

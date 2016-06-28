@@ -1,9 +1,9 @@
 ﻿///<reference path="./IRunSummary.ts"/>
-///<reference path="./IRunInfo.ts"/>
+///<reference path="./IItemInfo.ts"/>
 
 interface IRun {
     testRunFiles: Array<string>;
-    runInfo: IRunInfo;
+    runInfo: IItemInfo;
     summary: IRunSummary;
     name: string;
 }

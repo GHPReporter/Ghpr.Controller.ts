@@ -47,7 +47,7 @@
     <TypeScriptCompile Include="controller\enums\PageType.ts" />
     <TypeScriptCompile Include="controller\enums\TestResult.ts" />
     <TypeScriptCompile Include="controller\interfaces\IRun.ts" />
-    <TypeScriptCompile Include="controller\interfaces\IRunInfo.ts" />
+    <TypeScriptCompile Include="controller\interfaces\IItemInfo.ts" />
     <TypeScriptCompile Include="controller\interfaces\IRunSummary.ts" />
     <TypeScriptCompile Include="controller\interfaces\ITestEvent.ts" />
     <TypeScriptCompile Include="controller\interfaces\ITestRun.ts" />
