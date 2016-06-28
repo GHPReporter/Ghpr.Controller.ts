@@ -16,22 +16,40 @@ var PageType;
 class UrlHelper {
     static insertParam(key, value) {
         const paramsPart = document.location.search.substr(1);
+        window.history.pushState("", "", "");
+        const p = `${key}=${value}`;
         if (paramsPart === "") {
-            window.history.pushState("", "", `?${key}=${value}`);
+            window.history.pushState("", "", `?${p}`);
+        }
+        else {
+            let params = paramsPart.split("&");
+            const paramToChange = params.find((par) => par.split("=")[0] === key);
+            if (paramToChange != undefined) {
+                if (params.length === 1) {
+                    params = [p];
+                }
+                else {
+                    const index = params.indexOf(paramToChange);
+                    params.splice(index, 1);
+                    params.push(p);
+                }
+            }
+            window.history.pushState("", "", `?${params.join("&")}`);
+        }
+    }
+    static getParam(key) {
+        const paramsPart = document.location.search.substr(1);
+        if (paramsPart === "") {
+            return "";
         }
         else {
             const params = paramsPart.split("&");
-            console.log("paramsC: " + params.length);
-            for (let p of params) {
-                console.log(`p: ${p}`);
-                const kv = p.split("=");
-                const k = kv[0];
-                let v = kv[1];
-                console.log(`k: ${k}, v: ${v}`);
-                if (k === key) {
-                    v = value;
-                }
+            const paramToGet = params.find((par) => par.split("=")[0] === key);
+            if (paramToGet != undefined) {
+                return paramToGet.split("=")[1];
             }
+            else
+                return "";
         }
     }
 }
@@ -128,18 +146,38 @@ class RunPageUpdater {
         });
         return run;
     }
-    static loadRun(index) {
+    static loadRun(index = undefined) {
         let runInfos;
         var loader = new JsonLoader();
         loader.loadRunsJson((response) => {
             runInfos = JSON.parse(response, loader.reviveRun);
             this.runsCount = runInfos.length;
+            if (index === undefined || index.toString() === "NaN") {
+                index = this.runsCount - 1;
+                this.currentRun = index;
+            }
             this.updateRunPage(runInfos[index].guid);
         });
     }
-    static loadFirst() {
-        this.currentRun = 0;
-        this.loadRun(this.currentRun);
+    static tryLoadRunByGuid() {
+        const guid = UrlHelper.getParam("runGuid");
+        if (guid === "") {
+            this.loadRun();
+            return;
+        }
+        let runInfos;
+        var loader = new JsonLoader();
+        loader.loadRunsJson((response) => {
+            runInfos = JSON.parse(response, loader.reviveRun);
+            this.runsCount = runInfos.length;
+            const runInfo = runInfos.find((r) => r.guid === guid);
+            if (runInfo != undefined) {
+                this.loadRun(runInfos.indexOf(runInfo));
+            }
+            else {
+                this.loadRun();
+            }
+        });
     }
     static loadPrev() {
         if (this.currentRun === 0) {
@@ -159,9 +197,11 @@ class RunPageUpdater {
             this.loadRun(this.currentRun);
         }
     }
-    static loadCurrent() {
-        this.currentRun = this.runsCount - 1;
-        this.loadRun(this.currentRun);
+    static loadLatest() {
+        this.loadRun();
+    }
+    static initialize() {
+        this.tryLoadRunByGuid();
     }
 }
 class JsonLoader {
@@ -211,10 +251,7 @@ class JsonLoader {
         return value;
     }
 }
-function loadRun(guid) {
+function loadRun1(guid) {
     RunPageUpdater.updateRunPage(guid);
-}
-function loadFirstRun() {
-    RunPageUpdater.loadFirst();
 }
 //# sourceMappingURL=ghpr.controller.js.map

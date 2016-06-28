@@ -16,7 +16,7 @@
 </head>
 <body>
 <script type="text/javascript">
-    RunPageUpdater.loadFirst();
+    RunPageUpdater.initialize();
 </script>
 <div class="border-bottom p-3 mb-3">
     <div class="container">
@@ -33,12 +33,12 @@
             <span class="octicon octicon-arrow-left"></span>
             Prev
         </button>
-        <button class="btn" type="button"onclick="RunPageUpdater.loadCurrent();">
-            Current
-        </button>
         <button class="btn" type="button" onclick="RunPageUpdater.loadNext();">
             Next
             <span class="octicon octicon-arrow-right"></span>
+        </button>
+        <button class="btn" type="button" onclick="RunPageUpdater.loadLatest();">
+            Latest
         </button>
     </div>
     <div class="border-bottom p-3 mb-3">

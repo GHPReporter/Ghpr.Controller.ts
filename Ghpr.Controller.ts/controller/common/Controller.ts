@@ -1,10 +1,6 @@
 ﻿///<reference path="JsonLoader.ts"/>
 
-function loadRun(guid: string) {
+function loadRun1(guid: string) {
     RunPageUpdater.updateRunPage(guid);
-}
-
-function loadFirstRun() {
-    RunPageUpdater.loadFirst();
 }
 

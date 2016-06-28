@@ -76,21 +76,40 @@ class RunPageUpdater {
         return run;
     }
 
-    static loadRun(index: number): void {
+    static loadRun(index: number = undefined): void {
         let runInfos: Array<IRunInfo>;
         var loader = new JsonLoader();
         loader.loadRunsJson((response: string) => {
             runInfos = JSON.parse(response, loader.reviveRun);
             this.runsCount = runInfos.length;
+            if (index === undefined || index.toString() === "NaN") {
+                index = this.runsCount - 1;
+                this.currentRun = index;
+            }
             this.updateRunPage(runInfos[index].guid);
         });
     }
 
-    static loadFirst(): void {
-        this.currentRun = 0;
-        this.loadRun(this.currentRun);
+    static tryLoadRunByGuid(): void {
+        const guid = UrlHelper.getParam("runGuid");
+        if (guid === "") {
+            this.loadRun();
+            return;
+        }
+        let runInfos: Array<IRunInfo>;
+        var loader = new JsonLoader();
+        loader.loadRunsJson((response: string) => {
+            runInfos = JSON.parse(response, loader.reviveRun);
+            this.runsCount = runInfos.length;
+            const runInfo = runInfos.find((r) => r.guid === guid);
+            if (runInfo != undefined) {
+                this.loadRun(runInfos.indexOf(runInfo));
+            } else {
+                this.loadRun();
+            }
+        });
     }
-
+    
     static loadPrev(): void {
         if (this.currentRun === 0) {
             return;
@@ -110,8 +129,11 @@ class RunPageUpdater {
         }
     }
 
-    static loadCurrent(): void {
-        this.currentRun = this.runsCount - 1;
-        this.loadRun(this.currentRun);
+    static loadLatest(): void {
+        this.loadRun();
+    }
+
+    static initialize(): void {
+        this.tryLoadRunByGuid();
     }
 }
