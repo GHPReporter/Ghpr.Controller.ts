@@ -5,25 +5,25 @@
 ///<reference path="./UrlHelper.ts"/>
 ///<reference path="./DateFormatter.ts"/>
 ///<reference path="./Color.ts"/>
-
-declare var Plotly: any;
+///<reference path="./PlotlyJs.ts"/>
+///<reference path="./TabsHelper.ts"/>
 
 class RunPageUpdater {
 
     static currentRun: number;
     static runsCount: number; 
 
-    static updateTime(run: IRun): void {
+    private static updateTime(run: IRun): void {
         document.getElementById("start").innerHTML = `Start datetime: ${DateFormatter.format(run.runInfo.start)}`;
         document.getElementById("finish").innerHTML = `Finish datetime: ${DateFormatter.format(run.runInfo.finish)}`;
         document.getElementById("duration").innerHTML = `Duration: ${DateFormatter.diff(run.runInfo.start, run.runInfo.finish)}`;
     }
 
-    static updateName(run: IRun): void {
+    private static updateName(run: IRun): void {
         document.getElementById("run-name").innerHTML = run.name;
     }
 
-    static updateSummary(run: IRun): void {
+    private static updateSummary(run: IRun): void {
         const s = run.summary;
         document.getElementById("total").innerHTML = `Total: ${s.total}`;
         document.getElementById("passed").innerHTML = `Success: ${s.success}`;
@@ -63,10 +63,10 @@ class RunPageUpdater {
         });
     }
     
-    static updateRunPage(runGuid: string): IRun {
+    private static updateRunPage(runGuid: string): IRun {
         let run: IRun;
-        var loader = new JsonLoader();
-        loader.loadRunJson(runGuid, PageType.TestRunPage, (response: string) => {
+        var loader = new JsonLoader(PageType.TestRunPage);
+        loader.loadRunJson(runGuid, (response: string) => {
             run = JSON.parse(response, loader.reviveRun);
             UrlHelper.insertParam("runGuid", run.runInfo.guid);
             RunPageUpdater.updateTime(run);
@@ -76,9 +76,9 @@ class RunPageUpdater {
         return run;
     }
 
-    static loadRun(index: number = undefined): void {
+    private static loadRun(index: number = undefined): void {
         let runInfos: Array<IItemInfo>;
-        var loader = new JsonLoader();
+        var loader = new JsonLoader(PageType.TestRunPage);
         loader.loadRunsJson((response: string) => {
             runInfos = JSON.parse(response, loader.reviveRun);
             this.runsCount = runInfos.length;
@@ -86,54 +86,95 @@ class RunPageUpdater {
                 index = this.runsCount - 1;
                 this.currentRun = index;
             }
+            if (index === 0) {
+                this.disableBtn("btn-prev");
+            }
+            if (index === runInfos.length - 1) {
+                this.disableBtn("btn-next");
+            }
             this.updateRunPage(runInfos[index].guid);
         });
     }
 
-    static tryLoadRunByGuid(): void {
+    private static tryLoadRunByGuid(): void {
         const guid = UrlHelper.getParam("runGuid");
         if (guid === "") {
             this.loadRun();
             return;
         }
         let runInfos: Array<IItemInfo>;
-        var loader = new JsonLoader();
+        var loader = new JsonLoader(PageType.TestRunPage);
         loader.loadRunsJson((response: string) => {
             runInfos = JSON.parse(response, loader.reviveRun);
             this.runsCount = runInfos.length;
             const runInfo = runInfos.find((r) => r.guid === guid);
             if (runInfo != undefined) {
-                this.loadRun(runInfos.indexOf(runInfo));
+                this.enableBtns();
+                const index = runInfos.indexOf(runInfo);
+                if (index === 0) {
+                    this.disableBtn("btn-prev");
+                }
+                if (index === runInfos.length - 1) {
+                    this.disableBtn("btn-next");
+                }
+                this.loadRun(index);
             } else {
                 this.loadRun();
             }
         });
     }
-    
+
+    private static enableBtns(): void {
+        document.getElementById("btn-prev").removeAttribute("disabled");
+        document.getElementById("btn-next").removeAttribute("disabled");
+    }
+
+    private static disableBtn(id: string): void {
+        document.getElementById(id).setAttribute("disabled", "true");
+    }
+
     static loadPrev(): void {
         if (this.currentRun === 0) {
+            this.disableBtn("btn-prev");
             return;
         }
         else {
+            this.enableBtns();
             this.currentRun -= 1;
+            if (this.currentRun === 0) {
+                this.disableBtn("btn-prev");
+            }
             this.loadRun(this.currentRun);
         }
     }
 
     static loadNext(): void {
         if (this.currentRun === this.runsCount - 1) {
+            this.disableBtn("btn-next");
             return;
         } else {
+            this.enableBtns();
             this.currentRun += 1;
+            if (this.currentRun === this.runsCount - 1) {
+                this.disableBtn("btn-next");
+            }
             this.loadRun(this.currentRun);
         }
     }
 
     static loadLatest(): void {
+        this.disableBtn("btn-next");
         this.loadRun();
     }
 
-    static initialize(): void {
+    static initializePage(): void {
         this.tryLoadRunByGuid();
+        this.showTab("run-main-stats", document.getElementById("tab-run-main-stats"));
+    }
+
+    private static runPageTabsIds: Array<string> = ["run-main-stats", "run-test-list"];
+
+    static showTab(idToShow: string, caller: HTMLElement): void {
+        TabsHelper.showTab(idToShow, caller, this.runPageTabsIds);
     }
 }

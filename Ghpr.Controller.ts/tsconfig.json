@@ -16,9 +16,12 @@
         "controller/interfaces/ITestRun.ts",
         "controller/enums/TestResult.ts",
         "controller/enums/PageType.ts",
+        "controller/common/PathsHelper.ts",
+        "controller/common/TabsHelper.ts",
         "controller/common/JsonLoader.ts",
         "controller/common/DateFormatter.ts",
         "controller/common/RunPageUpdater.ts",
+        "controller/common/ReportPageUpdater.ts",
         "controller/common/Controller.ts",
         "controller/common/UrlHelper.ts"
   ]

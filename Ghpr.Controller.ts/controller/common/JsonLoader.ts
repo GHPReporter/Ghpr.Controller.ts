@@ -1,28 +1,23 @@
 ﻿///<reference path="./../interfaces/IRun.ts"/>
 ///<reference path="./../enums/PageType.ts"/>
 ///<reference path="./RunPageUpdater.ts"/>
+///<reference path="./PathsHelper.ts"/>
 
 class JsonLoader {
-    getRunPath(pt: PageType, guid: string): string {
-        switch (pt) {
-        case PageType.TestRunsPage:
-            return `./runs/run_${guid}.json`;
-        case PageType.TestRunPage:
-            return `./run_${guid}.json`;
-        case PageType.TestPage:
-            return `./../../runs/run_${guid}.json`;
-        default:
-            return "";
-        }
+
+    private pageType: PageType;
+
+    constructor(pt: PageType) {
+        this.pageType = pt;
     }
 
-    loadRunJson(runGuid: string, pt: PageType, callback: Function): void {
-        const path = this.getRunPath(pt, runGuid);
+    loadRunJson(runGuid: string, callback: Function): void {
+        const path = PathsHelper.getRunPath(this.pageType, runGuid);
         this.loadJson(path, callback);
     }
 
     loadRunsJson(callback: Function): void {
-        const path = "./runs.json";
+        const path = PathsHelper.getRunsPath(this.pageType);
         this.loadJson(path, callback);
     }
 
@@ -37,6 +32,33 @@ class JsonLoader {
                         .log(`Error while loading .json data! Request status: ${req.status} : ${req.statusText}`);
                 } else {
                     callback(req.responseText);
+                }
+        }
+        req.timeout = 2000;
+        req.ontimeout = () => {
+            console.log(`Timeout while loading .json data! Request status: ${req.status} : ${req.statusText}`);
+        };
+        req.send(null);
+    }
+
+    loadJsons(paths: Array<string>, ind: number, resps: Array<string>, callback: Function): void {
+        const count = paths.length;
+        if (ind >= count) {
+            callback(resps);
+            return;
+        }
+        const req = new XMLHttpRequest();
+        req.overrideMimeType("application/json");
+        req.open("get", paths[ind], true);
+        req.onreadystatechange = () => {
+            if (req.readyState === 4)
+                if (req.status !== 200) {
+                    console
+                        .log(`Error while loading .json data! Request status: ${req.status} : ${req.statusText}`);
+                } else {
+                    resps[ind] = req.responseText;
+                    ind++;
+                    this.loadJsons(paths, ind, resps, callback);
                 }
         }
         req.timeout = 2000;

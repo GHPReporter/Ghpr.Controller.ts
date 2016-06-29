@@ -42,7 +42,11 @@
     <TypeScriptCompile Include="controller\common\Controller.ts" />
     <TypeScriptCompile Include="controller\common\DateFormatter.ts" />
     <TypeScriptCompile Include="controller\common\JsonLoader.ts" />
+    <TypeScriptCompile Include="controller\common\PathsHelper.ts" />
+    <TypeScriptCompile Include="controller\common\PlotlyJs.ts" />
+    <TypeScriptCompile Include="controller\common\ReportPageUpdater.ts" />
     <TypeScriptCompile Include="controller\common\RunPageUpdater.ts" />
+    <TypeScriptCompile Include="controller\common\TabsHelper.ts" />
     <TypeScriptCompile Include="controller\common\UrlHelper.ts" />
     <TypeScriptCompile Include="controller\enums\PageType.ts" />
     <TypeScriptCompile Include="controller\enums\TestResult.ts" />
@@ -59,10 +63,13 @@
     <Content Include="report\src\octicons\octicons.woff" />
     <Content Include="tsconfig.json" />
     <Content Include="report\runs\runs.json" />
-    <Content Include="report\runs\run_80588711-53c2-4b1c-9d50-ba0e80a3f381.json" />
-    <Content Include="report\runs\run_9253dc84-9a58-4441-a8a5-2fb2020770ec.json" />
-    <Content Include="report\tests\test\test_20160627_165346398.json" />
-    <Content Include="report\tests\test\test_20160627_165935877.json" />
+    <Content Include="report\runs\run_10cbb6e5-2717-4f3e-8da5-226d995536c1.json" />
+    <Content Include="report\runs\run_89426d3f-6b12-4f0a-a871-87c7c6b6e8bd.json" />
+    <Content Include="report\runs\run_f8307320-ad4b-42a8-b1b3-5e797fb553e3.json" />
+    <Content Include="report\tests\test\tests.json" />
+    <Content Include="report\tests\test\test_20160629_121930975.json" />
+    <Content Include="report\tests\test\test_20160629_121942475.json" />
+    <Content Include="report\tests\test\test_20160629_121949839.json" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
