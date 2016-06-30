@@ -356,32 +356,56 @@ class ReportPageUpdater {
     }
     static updatePlotlyBars(runs) {
         document.getElementById("total").innerHTML = `Total: ${runs.length}`;
-        const s = runs[0].summary;
-        const pieDiv = document.getElementById("summary-pie");
-        Plotly.newPlot(pieDiv, [
-            {
-                values: [s.success, s.errors, s.failures, s.inconclusive, s.ignored, s.unknown],
-                labels: ["Passed", "Broken", "Failed", "Inconclusive", "Ignored", "Unknown"],
-                marker: {
-                    colors: [
-                        Color.passed, Color.broken, Color.failed, Color.inconclusive, Color.ignored, Color.unknown],
-                    line: {
-                        color: "white",
-                        width: 2
-                    }
-                },
-                outsidetextfont: {
-                    family: "Helvetica, arial, sans-serif"
-                },
-                textfont: {
-                    family: "Helvetica, arial, sans-serif"
-                },
-                textinfo: "label+percent",
-                type: "pie",
-                hole: 0.35
+        let plotlyData = new Array();
+        const passedY = new Array();
+        const failedY = new Array();
+        const brokenY = new Array();
+        const inconclY = new Array();
+        const ignoredY = new Array();
+        const unknownY = new Array();
+        const passedX = new Array();
+        const failedX = new Array();
+        const brokenX = new Array();
+        const inconclX = new Array();
+        const ignoredX = new Array();
+        const unknownX = new Array();
+        const tickvals = new Array();
+        const ticktext = new Array();
+        for (let i = 0; i < runs.length; i++) {
+            const s = runs[i].summary;
+            passedY[i] = s.success;
+            failedY[i] = s.failures;
+            brokenY[i] = s.errors;
+            inconclY[i] = s.inconclusive;
+            ignoredY[i] = s.ignored;
+            unknownY[i] = s.unknown;
+            passedX[i] = i;
+            failedX[i] = i;
+            brokenX[i] = i;
+            inconclX[i] = i;
+            ignoredX[i] = i;
+            unknownX[i] = i;
+            tickvals[i] = i;
+            ticktext[i] = `run ${i}`;
+        }
+        const trType = "bar";
+        const hi = "y";
+        plotlyData = [
+            { x: passedX, y: passedY, name: "passed", type: trType, hoverinfo: hi, marker: { color: Color.passed } },
+            { x: brokenX, y: brokenY, name: "broken", type: trType, hoverinfo: hi, marker: { color: Color.broken } },
+            { x: failedX, y: failedY, name: "failed", type: trType, hoverinfo: hi, marker: { color: Color.failed } },
+            { x: inconclX, y: inconclY, name: "inconclusive", type: trType, hoverinfo: hi, marker: { color: Color.inconclusive } },
+            { x: ignoredX, y: ignoredY, name: "ignored", type: trType, hoverinfo: hi, marker: { color: Color.ignored } },
+            { x: unknownX, y: unknownY, name: "unknown", type: trType, hoverinfo: hi, marker: { color: Color.unknown } }
+        ];
+        const pieDiv = document.getElementById("runs-bars");
+        Plotly.newPlot(pieDiv, plotlyData, {
+            barmode: "stack",
+            bargap: 0.01,
+            xaxis: {
+                tickvals: tickvals,
+                ticktext: ticktext
             }
-        ], {
-            margin: { t: 0 }
         });
     }
     static updatePage(index = undefined) {
@@ -396,7 +420,6 @@ class ReportPageUpdater {
                 paths[i] = `runs/run_${runInfos[i].guid}.json`;
             }
             loader.loadJsons(paths, 0, r, (responses) => {
-                console.log(responses);
                 for (let i = 0; i < responses.length; i++) {
                     runs[i] = JSON.parse(responses[i], loader.reviveRun);
                 }

@@ -17,36 +17,63 @@ class ReportPageUpdater {
     private static updatePlotlyBars(runs: Array<IRun>): void {
 
         document.getElementById("total").innerHTML = `Total: ${runs.length}`;
-
-        const s = runs[0].summary;
         
-        const pieDiv = document.getElementById("summary-pie");
-        Plotly.newPlot(pieDiv,
-        [
-            {
-                values: [s.success, s.errors, s.failures, s.inconclusive, s.ignored, s.unknown],
-                labels: ["Passed", "Broken", "Failed", "Inconclusive", "Ignored", "Unknown"],
-                marker: {
-                    colors: [
-                        Color.passed, Color.broken, Color.failed, Color.inconclusive, Color.ignored, Color.unknown],
-                    line: {
-                        color: "white",
-                        width: 2
-                    }
-                },
-                outsidetextfont: {
-                    family: "Helvetica, arial, sans-serif"
-                },
-                textfont: {
-                    family: "Helvetica, arial, sans-serif"
-                },
-                textinfo: "label+percent",
-                type: "pie",
-                hole: 0.35
-            }
-        ],
-        {
-            margin: { t: 0 }
+        let plotlyData = new Array();
+        const passedY: Array<number> = new Array();
+        const failedY: Array<number> = new Array();
+        const brokenY: Array<number> = new Array();
+        const inconclY: Array<number> = new Array();
+        const ignoredY: Array<number> = new Array();
+        const unknownY: Array<number> = new Array();
+
+        const passedX: Array<number> = new Array();
+        const failedX: Array<number> = new Array();
+        const brokenX: Array<number> = new Array();
+        const inconclX: Array<number> = new Array();
+        const ignoredX: Array<number> = new Array();
+        const unknownX: Array<number> = new Array();
+
+        const tickvals: Array<number> = new Array();
+        const ticktext: Array<string> = new Array();
+
+        for (let i = 0; i < runs.length; i++) {
+            const s = runs[i].summary;
+            passedY[i] = s.success;
+            failedY[i] = s.failures;
+            brokenY[i] = s.errors;
+            inconclY[i] = s.inconclusive;
+            ignoredY[i] = s.ignored;
+            unknownY[i] = s.unknown;
+
+            passedX[i] = i;
+            failedX[i] = i;
+            brokenX[i] = i;
+            inconclX[i] = i;
+            ignoredX[i] = i;
+            unknownX[i] = i;
+
+            tickvals[i] = i;
+            ticktext[i] = `run ${i}`;//runs[i].name;
+        }
+        const t = "bar";
+        const hi = "y";
+        plotlyData = [
+            { x: passedX, y: passedY,   name: "passed",       type: t, hoverinfo: hi, marker: { color: Color.passed } },
+            { x: brokenX,  y: brokenY,  name: "broken",       type: t, hoverinfo: hi, marker: { color: Color.broken } },
+            { x: failedX,  y: failedY,  name: "failed",       type: t, hoverinfo: hi, marker: { color: Color.failed } },
+            { x: inconclX, y: inconclY, name: "inconclusive", type: t, hoverinfo: hi, marker: { color: Color.inconclusive } },
+            { x: ignoredX, y: ignoredY, name: "ignored",      type: t, hoverinfo: hi, marker: { color: Color.ignored } },
+            { x: unknownX, y: unknownY, name: "unknown",      type: t, hoverinfo: hi, marker: { color: Color.unknown } }
+        ];
+
+        const pieDiv = document.getElementById("runs-bars");
+        Plotly.newPlot(pieDiv, plotlyData, {
+                barmode: "stack",
+                bargap: 0.01,
+                xaxis: {
+                    tickvals: tickvals,
+                    ticktext: ticktext
+                }
         });
     }
     
@@ -62,7 +89,6 @@ class ReportPageUpdater {
                 paths[i] = `runs/run_${runInfos[i].guid}.json`;
             }
             loader.loadJsons(paths, 0, r, (responses: Array<string>) => {
-                console.log(responses);
                 for (let i = 0; i < responses.length; i++) {
                     runs[i] = JSON.parse(responses[i], loader.reviveRun);
                 }
