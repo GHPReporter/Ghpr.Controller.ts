@@ -354,6 +354,15 @@ class ReportPageUpdater {
         document.getElementById("finish").innerHTML = `Finish datetime: ${DateFormatter.format(run.runInfo.finish)}`;
         document.getElementById("duration").innerHTML = `Duration: ${DateFormatter.diff(run.runInfo.start, run.runInfo.finish)}`;
     }
+    static updateRunsList(runs) {
+        let list = "";
+        const c = runs.length;
+        for (let i = 0; i < c; i++) {
+            const r = runs[i];
+            list += `<li id=$run-{r.runInfo.guid}>Run #${c - i - 1}: <a href="./runs/?runGuid=${r.runInfo.guid}">${r.name}</a></li>`;
+        }
+        document.getElementById("all-runs").innerHTML = list;
+    }
     static updatePlotlyBars(runs) {
         document.getElementById("total").innerHTML = `Total: ${runs.length}`;
         let plotlyData = new Array();
@@ -372,7 +381,7 @@ class ReportPageUpdater {
         const tickvals = new Array();
         const ticktext = new Array();
         for (let i = 0; i < runs.length; i++) {
-            const s = runs[i].summary;
+            let s = runs[i].summary;
             passedY[i] = s.success;
             failedY[i] = s.failures;
             brokenY[i] = s.errors;
@@ -388,15 +397,15 @@ class ReportPageUpdater {
             tickvals[i] = i;
             ticktext[i] = `run ${i}`;
         }
-        const trType = "bar";
+        const t = "bar";
         const hi = "y";
         plotlyData = [
-            { x: passedX, y: passedY, name: "passed", type: trType, hoverinfo: hi, marker: { color: Color.passed } },
-            { x: brokenX, y: brokenY, name: "broken", type: trType, hoverinfo: hi, marker: { color: Color.broken } },
-            { x: failedX, y: failedY, name: "failed", type: trType, hoverinfo: hi, marker: { color: Color.failed } },
-            { x: inconclX, y: inconclY, name: "inconclusive", type: trType, hoverinfo: hi, marker: { color: Color.inconclusive } },
-            { x: ignoredX, y: ignoredY, name: "ignored", type: trType, hoverinfo: hi, marker: { color: Color.ignored } },
-            { x: unknownX, y: unknownY, name: "unknown", type: trType, hoverinfo: hi, marker: { color: Color.unknown } }
+            { x: passedX, y: passedY, name: "passed", type: t, hoverinfo: hi, marker: { color: Color.passed } },
+            { x: brokenX, y: brokenY, name: "broken", type: t, hoverinfo: hi, marker: { color: Color.broken } },
+            { x: failedX, y: failedY, name: "failed", type: t, hoverinfo: hi, marker: { color: Color.failed } },
+            { x: inconclX, y: inconclY, name: "inconclusive", type: t, hoverinfo: hi, marker: { color: Color.inconclusive } },
+            { x: ignoredX, y: ignoredY, name: "ignored", type: t, hoverinfo: hi, marker: { color: Color.ignored } },
+            { x: unknownX, y: unknownY, name: "unknown", type: t, hoverinfo: hi, marker: { color: Color.unknown } }
         ];
         const pieDiv = document.getElementById("runs-bars");
         Plotly.newPlot(pieDiv, plotlyData, {
@@ -425,6 +434,7 @@ class ReportPageUpdater {
                 }
                 this.updateFields(runs[runs.length - 1]);
                 this.updatePlotlyBars(runs);
+                this.updateRunsList(runs);
             });
         });
     }

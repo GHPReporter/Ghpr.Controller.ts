@@ -14,6 +14,16 @@ class ReportPageUpdater {
         document.getElementById("duration").innerHTML = `Duration: ${DateFormatter.diff(run.runInfo.start, run.runInfo.finish)}`;
     }
 
+    private static updateRunsList(runs: Array<IRun>): void {
+        let list = "";
+        const c = runs.length;
+        for (let i = 0; i < c; i++) {
+            const r = runs[i];
+            list += `<li id=$run-{r.runInfo.guid}>Run #${c-i-1}: <a href="./runs/?runGuid=${r.runInfo.guid}">${r.name}</a></li>`;
+        }
+        document.getElementById("all-runs").innerHTML = list;
+    }
+    
     private static updatePlotlyBars(runs: Array<IRun>): void {
 
         document.getElementById("total").innerHTML = `Total: ${runs.length}`;
@@ -37,7 +47,7 @@ class ReportPageUpdater {
         const ticktext: Array<string> = new Array();
 
         for (let i = 0; i < runs.length; i++) {
-            const s = runs[i].summary;
+            let s = runs[i].summary;
             passedY[i] = s.success;
             failedY[i] = s.failures;
             brokenY[i] = s.errors;
@@ -94,6 +104,7 @@ class ReportPageUpdater {
                 }
                 this.updateFields(runs[runs.length - 1]);
                 this.updatePlotlyBars(runs);
+                this.updateRunsList(runs);
             });
         });
     }
