@@ -380,7 +380,9 @@ class ReportPageUpdater {
         const unknownX = new Array();
         const tickvals = new Array();
         const ticktext = new Array();
-        for (let i = 0; i < runs.length; i++) {
+        const c = runs.length;
+        for (let i = 0; i < c; i++) {
+            console.log(runs[i]);
             let s = runs[i].summary;
             passedY[i] = s.success;
             failedY[i] = s.failures;
@@ -388,14 +390,16 @@ class ReportPageUpdater {
             inconclY[i] = s.inconclusive;
             ignoredY[i] = s.ignored;
             unknownY[i] = s.unknown;
-            passedX[i] = i;
-            failedX[i] = i;
-            brokenX[i] = i;
-            inconclX[i] = i;
-            ignoredX[i] = i;
-            unknownX[i] = i;
-            tickvals[i] = i;
-            ticktext[i] = `run ${i}`;
+            let j = c - i - 1;
+            passedX[i] = j;
+            failedX[i] = j;
+            brokenX[i] = j;
+            inconclX[i] = j;
+            ignoredX[i] = j;
+            unknownX[i] = j;
+            tickvals[i] = j;
+            ticktext[i] = `run ${j}`;
+            console.log(passedY);
         }
         const t = "bar";
         const hi = "y";
