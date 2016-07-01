@@ -21,6 +21,16 @@ class JsonLoader {
         this.loadJson(path, callback);
     }
 
+    loadTestJson(testGuid: string, testFileName: string, callback: Function): void {
+        const path = PathsHelper.getTestPath(testGuid, testFileName, this.pageType);
+        this.loadJson(path, callback);
+    }
+
+    loadTestsJson(testGuid: string, callback: Function): void {
+        const path = PathsHelper.getTestsPath(testGuid, this.pageType);
+        this.loadJson(path, callback);
+    }
+
     loadJson(path: string, callback: Function): void {
         const req = new XMLHttpRequest();
         req.overrideMimeType("application/json");
@@ -29,14 +39,14 @@ class JsonLoader {
             if (req.readyState === 4)
                 if (req.status !== 200) {
                     console
-                        .log(`Error while loading .json data! Request status: ${req.status} : ${req.statusText}`);
+                        .log(`Error while loading .json data: '${path}'! Request status: ${req.status} : ${req.statusText}`);
                 } else {
                     callback(req.responseText);
                 }
         }
         req.timeout = 2000;
         req.ontimeout = () => {
-            console.log(`Timeout while loading .json data! Request status: ${req.status} : ${req.statusText}`);
+            console.log(`Timeout while loading .json data: '${path}'! Request status: ${req.status} : ${req.statusText}`);
         };
         req.send(null);
     }
@@ -54,7 +64,7 @@ class JsonLoader {
             if (req.readyState === 4)
                 if (req.status !== 200) {
                     console
-                        .log(`Error while loading .json data! Request status: ${req.status} : ${req.statusText}`);
+                        .log(`Error while loading .json data: '${paths[ind]}'! Request status: ${req.status} : ${req.statusText}`);
                 } else {
                     resps[ind] = req.responseText;
                     ind++;
@@ -63,7 +73,7 @@ class JsonLoader {
         }
         req.timeout = 2000;
         req.ontimeout = () => {
-            console.log(`Timeout while loading .json data! Request status: ${req.status} : ${req.statusText}`);
+            console.log(`Timeout while loading .json data: '${paths[ind]}'! Request status: ${req.status} : ${req.statusText}`);
         };
         req.send(null);
     }

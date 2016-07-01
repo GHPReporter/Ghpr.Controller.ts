@@ -1,5 +1,6 @@
 ﻿///<reference path="./../interfaces/IItemInfo.ts"/>
 ///<reference path="./../interfaces/IRun.ts"/>
+///<reference path="./../interfaces/ITestRun.ts"/>
 ///<reference path="./../enums/PageType.ts"/>
 ///<reference path="./JsonLoader.ts"/>
 ///<reference path="./UrlHelper.ts"/>
@@ -62,6 +63,16 @@ class RunPageUpdater {
             margin: { t: 0 }
         });
     }
+
+    private static setTestsList(tests: Array<ITestRun>): void {
+        let list = "";
+        const c = tests.length;
+        for (let i = 0; i < c; i++) {
+            const r = tests[i];
+            list += `<li id=$run-${r.testInfo.guid}>Test #${c - i - 1}: <a href="./runs/?runGuid=${r.testInfo.guid}">${r.name}</a></li>`;
+        }
+        document.getElementById("all-tests").innerHTML = list;
+    }
     
     private static updateRunPage(runGuid: string): IRun {
         let run: IRun;
@@ -69,11 +80,31 @@ class RunPageUpdater {
         loader.loadRunJson(runGuid, (response: string) => {
             run = JSON.parse(response, loader.reviveRun);
             UrlHelper.insertParam("runGuid", run.runInfo.guid);
-            RunPageUpdater.updateTime(run);
-            RunPageUpdater.updateSummary(run);
-            RunPageUpdater.updateName(run);
+            this.updateTime(run);
+            this.updateSummary(run);
+            this.updateName(run);
+            this.updateTestsList(run);
         });
         return run;
+    }
+
+    static updateTestsList(run: IRun): void {
+        const paths: Array<string> = new Array();
+        const testStrings: Array<string> = new Array();
+        const tests: Array<ITestRun> = new Array();
+        var loader = new JsonLoader(PageType.TestRunPage);
+
+        const files = run.testRunFiles;
+        for (let i = 0; i < files.length; i++) {
+            paths[i] = `./../tests/${files[i]}`;
+        }
+        loader.loadJsons(paths, 0, testStrings, (responses: Array<string>) => {
+            for (let i = 0; i < responses.length; i++) {
+                tests[i] = JSON.parse(responses[i], loader.reviveRun);
+            }
+            this.setTestsList(tests);
+        });
+        
     }
 
     private static loadRun(index: number = undefined): void {

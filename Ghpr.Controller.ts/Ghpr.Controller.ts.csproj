@@ -34,7 +34,7 @@
     <Content Include="report\src\octicons\octicons.svg" />
     <Content Include="report\src\style\github.css" />
     <Content Include="report\src\style\primer.css" />
-    <Content Include="report\tests\test\index.html" />
+    <Content Include="report\tests\11111111-1111-1111-1111-111111111111\index.html" />
     <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -66,10 +66,10 @@
     <Content Include="report\runs\run_10cbb6e5-2717-4f3e-8da5-226d995536c1.json" />
     <Content Include="report\runs\run_89426d3f-6b12-4f0a-a871-87c7c6b6e8bd.json" />
     <Content Include="report\runs\run_f8307320-ad4b-42a8-b1b3-5e797fb553e3.json" />
-    <Content Include="report\tests\test\tests.json" />
-    <Content Include="report\tests\test\test_20160629_121930975.json" />
-    <Content Include="report\tests\test\test_20160629_121942475.json" />
-    <Content Include="report\tests\test\test_20160629_121949839.json" />
+    <Content Include="report\tests\11111111-1111-1111-1111-111111111111\tests.json" />
+    <Content Include="report\tests\11111111-1111-1111-1111-111111111111\test_20160629_121930975.json" />
+    <Content Include="report\tests\11111111-1111-1111-1111-111111111111\test_20160629_121942475.json" />
+    <Content Include="report\tests\11111111-1111-1111-1111-111111111111\test_20160629_121949839.json" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>

@@ -19,7 +19,7 @@ class ReportPageUpdater {
         const c = runs.length;
         for (let i = 0; i < c; i++) {
             const r = runs[i];
-            list += `<li id=$run-{r.runInfo.guid}>Run #${c-i-1}: <a href="./runs/?runGuid=${r.runInfo.guid}">${r.name}</a></li>`;
+            list += `<li id=$run-${r.runInfo.guid}>Run #${c-i-1}: <a href="./runs/?runGuid=${r.runInfo.guid}">${r.name}</a></li>`;
         }
         document.getElementById("all-runs").innerHTML = list;
     }
@@ -48,8 +48,8 @@ class ReportPageUpdater {
 
         const c = runs.length;
         for (let i = 0; i < c; i++) {
-            console.log(runs[i]);
             let s = runs[i].summary;
+            //let ri = runs[i].runInfo;
             passedY[i] = s.success;
             failedY[i] = s.failures;
             brokenY[i] = s.errors;
@@ -66,19 +66,17 @@ class ReportPageUpdater {
             unknownX[i] = j;
 
             tickvals[i] = j;
-            ticktext[i] = `run ${j}`;//runs[i].name;
-            
-            console.log(passedY);
+            ticktext[i] = `run ${j}`;// `run ${j} ${ri.start}`;
         }
         const t = "bar";
         const hi = "y";
         plotlyData = [
-            { x: passedX, y: passedY,   name: "passed",       type: t, hoverinfo: hi, marker: { color: Color.passed } },
-            { x: brokenX,  y: brokenY,  name: "broken",       type: t, hoverinfo: hi, marker: { color: Color.broken } },
-            { x: failedX,  y: failedY,  name: "failed",       type: t, hoverinfo: hi, marker: { color: Color.failed } },
+            { x: unknownX, y: unknownY, name: "unknown",      type: t, hoverinfo: hi, marker: { color: Color.unknown } },
             { x: inconclX, y: inconclY, name: "inconclusive", type: t, hoverinfo: hi, marker: { color: Color.inconclusive } },
             { x: ignoredX, y: ignoredY, name: "ignored",      type: t, hoverinfo: hi, marker: { color: Color.ignored } },
-            { x: unknownX, y: unknownY, name: "unknown",      type: t, hoverinfo: hi, marker: { color: Color.unknown } }
+            { x: brokenX,  y: brokenY,  name: "broken",       type: t, hoverinfo: hi, marker: { color: Color.broken } },
+            { x: failedX,  y: failedY,  name: "failed",       type: t, hoverinfo: hi, marker: { color: Color.failed } },
+            { x: passedX,  y: passedY,   name: "passed",      type: t, hoverinfo: hi, marker: { color: Color.passed } }
         ];
 
         const pieDiv = document.getElementById("runs-bars");

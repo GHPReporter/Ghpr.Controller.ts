@@ -26,4 +26,30 @@ class PathsHelper {
                 return "";
         }
     }
+
+    static getTestsPath(testGuid: string, pt: PageType): string {
+        switch (pt) {
+            case PageType.TestRunsPage:
+                return `./tests/${testGuid}/tests.json`;
+            case PageType.TestRunPage:
+                return `./../tests/${testGuid}/tests.json`;
+            case PageType.TestPage:
+                return `./tests.json`;
+            default:
+                return "";
+        }
+    }
+
+    static getTestPath(testGuid: string, testFileName: string, pt: PageType): string {
+        switch (pt) {
+            case PageType.TestRunsPage:
+                return `./tests/${testGuid}/${testFileName}.json`;
+            case PageType.TestRunPage:
+                return `./../tests/${testGuid}/${testFileName}.json`;
+            case PageType.TestPage:
+                return `./${testFileName}.json`;
+            default:
+                return "";
+        }
+    }
 }

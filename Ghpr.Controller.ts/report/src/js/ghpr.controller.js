@@ -38,6 +38,30 @@ class PathsHelper {
                 return "";
         }
     }
+    static getTestsPath(testGuid, pt) {
+        switch (pt) {
+            case PageType.TestRunsPage:
+                return `./tests/${testGuid}/tests.json`;
+            case PageType.TestRunPage:
+                return `./../tests/${testGuid}/tests.json`;
+            case PageType.TestPage:
+                return `./tests.json`;
+            default:
+                return "";
+        }
+    }
+    static getTestPath(testGuid, testFileName, pt) {
+        switch (pt) {
+            case PageType.TestRunsPage:
+                return `./tests/${testGuid}/${testFileName}.json`;
+            case PageType.TestRunPage:
+                return `./../tests/${testGuid}/${testFileName}.json`;
+            case PageType.TestPage:
+                return `./${testFileName}.json`;
+            default:
+                return "";
+        }
+    }
 }
 class TabsHelper {
     static showTab(idToShow, caller, pageTabsIds) {
@@ -176,17 +200,43 @@ class RunPageUpdater {
             margin: { t: 0 }
         });
     }
+    static setTestsList(tests) {
+        let list = "";
+        const c = tests.length;
+        for (let i = 0; i < c; i++) {
+            const r = tests[i];
+            list += `<li id=$run-${r.testInfo.guid}>Test #${c - i - 1}: <a href="./runs/?runGuid=${r.testInfo.guid}">${r.name}</a></li>`;
+        }
+        document.getElementById("all-tests").innerHTML = list;
+    }
     static updateRunPage(runGuid) {
         let run;
         var loader = new JsonLoader(PageType.TestRunPage);
         loader.loadRunJson(runGuid, (response) => {
             run = JSON.parse(response, loader.reviveRun);
             UrlHelper.insertParam("runGuid", run.runInfo.guid);
-            RunPageUpdater.updateTime(run);
-            RunPageUpdater.updateSummary(run);
-            RunPageUpdater.updateName(run);
+            this.updateTime(run);
+            this.updateSummary(run);
+            this.updateName(run);
+            this.updateTestsList(run);
         });
         return run;
+    }
+    static updateTestsList(run) {
+        const paths = new Array();
+        const testStrings = new Array();
+        const tests = new Array();
+        var loader = new JsonLoader(PageType.TestRunPage);
+        const files = run.testRunFiles;
+        for (let i = 0; i < files.length; i++) {
+            paths[i] = `./../tests/${files[i]}`;
+        }
+        loader.loadJsons(paths, 0, testStrings, (responses) => {
+            for (let i = 0; i < responses.length; i++) {
+                tests[i] = JSON.parse(responses[i], loader.reviveRun);
+            }
+            this.setTestsList(tests);
+        });
     }
     static loadRun(index = undefined) {
         let runInfos;
@@ -295,6 +345,14 @@ class JsonLoader {
         const path = PathsHelper.getRunsPath(this.pageType);
         this.loadJson(path, callback);
     }
+    loadTestJson(testGuid, testFileName, callback) {
+        const path = PathsHelper.getTestPath(testGuid, testFileName, this.pageType);
+        this.loadJson(path, callback);
+    }
+    loadTestsJson(testGuid, callback) {
+        const path = PathsHelper.getTestsPath(testGuid, this.pageType);
+        this.loadJson(path, callback);
+    }
     loadJson(path, callback) {
         const req = new XMLHttpRequest();
         req.overrideMimeType("application/json");
@@ -303,7 +361,7 @@ class JsonLoader {
             if (req.readyState === 4)
                 if (req.status !== 200) {
                     console
-                        .log(`Error while loading .json data! Request status: ${req.status} : ${req.statusText}`);
+                        .log(`Error while loading .json data: '${path}'! Request status: ${req.status} : ${req.statusText}`);
                 }
                 else {
                     callback(req.responseText);
@@ -311,7 +369,7 @@ class JsonLoader {
         };
         req.timeout = 2000;
         req.ontimeout = () => {
-            console.log(`Timeout while loading .json data! Request status: ${req.status} : ${req.statusText}`);
+            console.log(`Timeout while loading .json data: '${path}'! Request status: ${req.status} : ${req.statusText}`);
         };
         req.send(null);
     }
@@ -328,7 +386,7 @@ class JsonLoader {
             if (req.readyState === 4)
                 if (req.status !== 200) {
                     console
-                        .log(`Error while loading .json data! Request status: ${req.status} : ${req.statusText}`);
+                        .log(`Error while loading .json data: '${paths[ind]}'! Request status: ${req.status} : ${req.statusText}`);
                 }
                 else {
                     resps[ind] = req.responseText;
@@ -338,7 +396,7 @@ class JsonLoader {
         };
         req.timeout = 2000;
         req.ontimeout = () => {
-            console.log(`Timeout while loading .json data! Request status: ${req.status} : ${req.statusText}`);
+            console.log(`Timeout while loading .json data: '${paths[ind]}'! Request status: ${req.status} : ${req.statusText}`);
         };
         req.send(null);
     }
@@ -359,7 +417,7 @@ class ReportPageUpdater {
         const c = runs.length;
         for (let i = 0; i < c; i++) {
             const r = runs[i];
-            list += `<li id=$run-{r.runInfo.guid}>Run #${c - i - 1}: <a href="./runs/?runGuid=${r.runInfo.guid}">${r.name}</a></li>`;
+            list += `<li id=$run-${r.runInfo.guid}>Run #${c - i - 1}: <a href="./runs/?runGuid=${r.runInfo.guid}">${r.name}</a></li>`;
         }
         document.getElementById("all-runs").innerHTML = list;
     }
@@ -382,7 +440,6 @@ class ReportPageUpdater {
         const ticktext = new Array();
         const c = runs.length;
         for (let i = 0; i < c; i++) {
-            console.log(runs[i]);
             let s = runs[i].summary;
             passedY[i] = s.success;
             failedY[i] = s.failures;
@@ -399,17 +456,16 @@ class ReportPageUpdater {
             unknownX[i] = j;
             tickvals[i] = j;
             ticktext[i] = `run ${j}`;
-            console.log(passedY);
         }
         const t = "bar";
         const hi = "y";
         plotlyData = [
-            { x: passedX, y: passedY, name: "passed", type: t, hoverinfo: hi, marker: { color: Color.passed } },
-            { x: brokenX, y: brokenY, name: "broken", type: t, hoverinfo: hi, marker: { color: Color.broken } },
-            { x: failedX, y: failedY, name: "failed", type: t, hoverinfo: hi, marker: { color: Color.failed } },
+            { x: unknownX, y: unknownY, name: "unknown", type: t, hoverinfo: hi, marker: { color: Color.unknown } },
             { x: inconclX, y: inconclY, name: "inconclusive", type: t, hoverinfo: hi, marker: { color: Color.inconclusive } },
             { x: ignoredX, y: ignoredY, name: "ignored", type: t, hoverinfo: hi, marker: { color: Color.ignored } },
-            { x: unknownX, y: unknownY, name: "unknown", type: t, hoverinfo: hi, marker: { color: Color.unknown } }
+            { x: brokenX, y: brokenY, name: "broken", type: t, hoverinfo: hi, marker: { color: Color.broken } },
+            { x: failedX, y: failedY, name: "failed", type: t, hoverinfo: hi, marker: { color: Color.failed } },
+            { x: passedX, y: passedY, name: "passed", type: t, hoverinfo: hi, marker: { color: Color.passed } }
         ];
         const pieDiv = document.getElementById("runs-bars");
         Plotly.newPlot(pieDiv, plotlyData, {
