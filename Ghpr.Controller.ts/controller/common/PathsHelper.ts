@@ -34,7 +34,7 @@ class PathsHelper {
             case PageType.TestRunPage:
                 return `./../tests/${testGuid}/tests.json`;
             case PageType.TestPage:
-                return `./tests.json`;
+                return `./${testGuid}/tests.json`;
             default:
                 return "";
         }
@@ -43,11 +43,11 @@ class PathsHelper {
     static getTestPath(testGuid: string, testFileName: string, pt: PageType): string {
         switch (pt) {
             case PageType.TestRunsPage:
-                return `./tests/${testGuid}/${testFileName}.json`;
+                return `./tests/${testGuid}/${testFileName}`;
             case PageType.TestRunPage:
-                return `./../tests/${testGuid}/${testFileName}.json`;
+                return `./../tests/${testGuid}/${testFileName}`;
             case PageType.TestPage:
-                return `./${testFileName}.json`;
+                return `./${testGuid}/${testFileName}`;
             default:
                 return "";
         }

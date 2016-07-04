@@ -45,7 +45,7 @@ class PathsHelper {
             case PageType.TestRunPage:
                 return `./../tests/${testGuid}/tests.json`;
             case PageType.TestPage:
-                return `./tests.json`;
+                return `./${testGuid}/tests.json`;
             default:
                 return "";
         }
@@ -53,30 +53,14 @@ class PathsHelper {
     static getTestPath(testGuid, testFileName, pt) {
         switch (pt) {
             case PageType.TestRunsPage:
-                return `./tests/${testGuid}/${testFileName}.json`;
+                return `./tests/${testGuid}/${testFileName}`;
             case PageType.TestRunPage:
-                return `./../tests/${testGuid}/${testFileName}.json`;
+                return `./../tests/${testGuid}/${testFileName}`;
             case PageType.TestPage:
-                return `./${testFileName}.json`;
+                return `./${testGuid}/${testFileName}`;
             default:
                 return "";
         }
-    }
-}
-class TabsHelper {
-    static showTab(idToShow, caller, pageTabsIds) {
-        if (pageTabsIds.indexOf(idToShow) <= -1) {
-            return;
-        }
-        const tabs = document.getElementsByClassName("tabnav-tab");
-        for (let i = 0; i < tabs.length; i++) {
-            tabs[i].classList.remove("selected");
-        }
-        caller.className += " selected";
-        pageTabsIds.forEach((id) => {
-            document.getElementById(id).style.display = "none";
-        });
-        document.getElementById(idToShow).style.display = "";
     }
 }
 class UrlHelper {
@@ -100,6 +84,9 @@ class UrlHelper {
                     params.push(p);
                 }
             }
+            else {
+                params.push(p);
+            }
             window.history.pushState("", "", `?${params.join("&")}`);
         }
     }
@@ -117,6 +104,23 @@ class UrlHelper {
             else
                 return "";
         }
+    }
+}
+class TabsHelper {
+    static showTab(idToShow, caller, pageTabsIds) {
+        if (pageTabsIds.indexOf(idToShow) <= -1) {
+            return;
+        }
+        UrlHelper.insertParam("currentTab", idToShow);
+        const tabs = document.getElementsByClassName("tabnav-tab");
+        for (let i = 0; i < tabs.length; i++) {
+            tabs[i].classList.remove("selected");
+        }
+        caller.className += " selected";
+        pageTabsIds.forEach((id) => {
+            document.getElementById(id).style.display = "none";
+        });
+        document.getElementById(idToShow).style.display = "";
     }
 }
 class DateFormatter {
@@ -204,8 +208,8 @@ class RunPageUpdater {
         let list = "";
         const c = tests.length;
         for (let i = 0; i < c; i++) {
-            const r = tests[i];
-            list += `<li id=$run-${r.testInfo.guid}>Test #${c - i - 1}: <a href="./runs/?runGuid=${r.testInfo.guid}">${r.name}</a></li>`;
+            const t = tests[i];
+            list += `<li id=$test-${t.testInfo.guid}>Test #${c - i - 1}: <a href="./../tests/?testGuid=${t.testInfo.guid}&testFile=${t.testInfo.fileName}">${t.name}</a></li>`;
         }
         document.getElementById("all-tests").innerHTML = list;
     }
@@ -238,11 +242,21 @@ class RunPageUpdater {
             this.setTestsList(tests);
         });
     }
+    static sorter(a, b) {
+        if (a.finish > b.finish) {
+            return 1;
+        }
+        if (a.finish < b.finish) {
+            return -1;
+        }
+        return 0;
+    }
     static loadRun(index = undefined) {
         let runInfos;
         var loader = new JsonLoader(PageType.TestRunPage);
         loader.loadRunsJson((response) => {
             runInfos = JSON.parse(response, loader.reviveRun);
+            runInfos.sort(this.sorter);
             this.runsCount = runInfos.length;
             if (index === undefined || index.toString() === "NaN") {
                 index = this.runsCount - 1;
@@ -267,6 +281,7 @@ class RunPageUpdater {
         var loader = new JsonLoader(PageType.TestRunPage);
         loader.loadRunsJson((response) => {
             runInfos = JSON.parse(response, loader.reviveRun);
+            runInfos.sort(this.sorter);
             this.runsCount = runInfos.length;
             const runInfo = runInfos.find((r) => r.guid === guid);
             if (runInfo != undefined) {
@@ -498,11 +513,197 @@ class ReportPageUpdater {
             });
         });
     }
+    static initializePage() {
+        this.updatePage();
+        this.showTab("runs-stats", document.getElementById("tab-runs-stats"));
+    }
     static showTab(idToShow, caller) {
         TabsHelper.showTab(idToShow, caller, this.reportPageTabsIds);
     }
 }
 ReportPageUpdater.reportPageTabsIds = ["runs-stats", "runs-list"];
+class TestPageUpdater {
+    static updateMainInformation(test) {
+        document.getElementById("start").innerHTML = `Start datetime: ${DateFormatter.format(test.testInfo.start)}`;
+        document.getElementById("finish").innerHTML = `Finish datetime: ${DateFormatter.format(test.testInfo.finish)}`;
+        document.getElementById("duration").innerHTML = `Duration: ${test.testDuration}`;
+    }
+    static updateSummary(run) {
+        const s = run.summary;
+        document.getElementById("total").innerHTML = `Total: ${s.total}`;
+        document.getElementById("passed").innerHTML = `Success: ${s.success}`;
+        document.getElementById("broken").innerHTML = `Errors: ${s.errors}`;
+        document.getElementById("failed").innerHTML = `Failures: ${s.failures}`;
+        document.getElementById("inconclusive").innerHTML = `Inconclusive: ${s.inconclusive}`;
+        document.getElementById("ignored").innerHTML = `Ignored: ${s.ignored}`;
+        document.getElementById("unknown").innerHTML = `Unknown: ${s.unknown}`;
+        const pieDiv = document.getElementById("summary-pie");
+        Plotly.newPlot(pieDiv, [
+            {
+                values: [s.success, s.errors, s.failures, s.inconclusive, s.ignored, s.unknown],
+                labels: ["Passed", "Broken", "Failed", "Inconclusive", "Ignored", "Unknown"],
+                marker: {
+                    colors: [
+                        Color.passed, Color.broken, Color.failed, Color.inconclusive, Color.ignored, Color.unknown],
+                    line: {
+                        color: "white",
+                        width: 2
+                    }
+                },
+                outsidetextfont: {
+                    family: "Helvetica, arial, sans-serif"
+                },
+                textfont: {
+                    family: "Helvetica, arial, sans-serif"
+                },
+                textinfo: "label+percent",
+                type: "pie",
+                hole: 0.35
+            }
+        ], {
+            margin: { t: 0 }
+        });
+    }
+    static setTestsList(tests) {
+        let list = "";
+        const c = tests.length;
+        for (let i = 0; i < c; i++) {
+            const t = tests[i];
+            list += `<li id=$test-${t.testInfo.guid}>Test #${c - i - 1}: <a href="./../tests/?testGuid=${t.testInfo.guid}&testFile=${t.testInfo.fileName}">${t.name}</a></li>`;
+        }
+        document.getElementById("all-tests").innerHTML = list;
+    }
+    static updateTestPage(testGuid, fileName) {
+        let test;
+        var loader = new JsonLoader(PageType.TestPage);
+        loader.loadTestJson(testGuid, fileName, (response) => {
+            test = JSON.parse(response, loader.reviveRun);
+            UrlHelper.insertParam("testGuid", test.testInfo.guid);
+            UrlHelper.insertParam("testFile", test.testInfo.fileName);
+            this.updateMainInformation(test);
+        });
+        return test;
+    }
+    static updateTestsList(run) {
+        const paths = new Array();
+        const testStrings = new Array();
+        const tests = new Array();
+        var loader = new JsonLoader(PageType.TestPage);
+        const files = run.testRunFiles;
+        for (let i = 0; i < files.length; i++) {
+            paths[i] = `./../tests/${files[i]}`;
+        }
+        loader.loadJsons(paths, 0, testStrings, (responses) => {
+            for (let i = 0; i < responses.length; i++) {
+                tests[i] = JSON.parse(responses[i], loader.reviveRun);
+            }
+            this.setTestsList(tests);
+        });
+    }
+    static sorter(a, b) {
+        if (a.finish > b.finish) {
+            return 1;
+        }
+        if (a.finish < b.finish) {
+            return -1;
+        }
+        return 0;
+    }
+    static loadTest(index = undefined) {
+        const guid = UrlHelper.getParam("testGuid");
+        let testInfos;
+        var loader = new JsonLoader(PageType.TestPage);
+        loader.loadTestsJson(guid, (response) => {
+            testInfos = JSON.parse(response, loader.reviveRun);
+            testInfos.sort(this.sorter);
+            this.testVersionsCount = testInfos.length;
+            if (index === undefined || index.toString() === "NaN") {
+                index = this.testVersionsCount - 1;
+                this.currentTest = index;
+            }
+            if (index === 0) {
+                this.disableBtn("btn-prev");
+            }
+            if (index === testInfos.length - 1) {
+                this.disableBtn("btn-next");
+            }
+            TestPageUpdater.updateTestPage(testInfos[index].guid, testInfos[index].fileName);
+        });
+    }
+    static tryLoadTestByGuid() {
+        const guid = UrlHelper.getParam("testGuid");
+        const fileName = UrlHelper.getParam("testFile");
+        let testInfos;
+        var loader = new JsonLoader(PageType.TestPage);
+        loader.loadTestsJson(guid, (response) => {
+            testInfos = JSON.parse(response, loader.reviveRun);
+            testInfos.sort(this.sorter);
+            this.testVersionsCount = testInfos.length;
+            const testInfo = testInfos.find((t) => t.fileName === fileName);
+            if (testInfo != undefined) {
+                this.enableBtns();
+                const index = testInfos.indexOf(testInfo);
+                if (index === 0) {
+                    this.disableBtn("btn-prev");
+                }
+                if (index === testInfos.length - 1) {
+                    this.disableBtn("btn-next");
+                }
+                this.loadTest(index);
+            }
+            else {
+                this.loadTest();
+            }
+        });
+    }
+    static enableBtns() {
+        document.getElementById("btn-prev").removeAttribute("disabled");
+        document.getElementById("btn-next").removeAttribute("disabled");
+    }
+    static disableBtn(id) {
+        document.getElementById(id).setAttribute("disabled", "true");
+    }
+    static loadPrev() {
+        if (this.currentTest === 0) {
+            this.disableBtn("btn-prev");
+            return;
+        }
+        else {
+            this.enableBtns();
+            this.currentTest -= 1;
+            if (this.currentTest === 0) {
+                this.disableBtn("btn-prev");
+            }
+            this.loadTest(this.currentTest);
+        }
+    }
+    static loadNext() {
+        if (this.currentTest === this.testVersionsCount - 1) {
+            this.disableBtn("btn-next");
+            return;
+        }
+        else {
+            this.enableBtns();
+            this.currentTest += 1;
+            if (this.currentTest === this.testVersionsCount - 1) {
+                this.disableBtn("btn-next");
+            }
+            this.loadTest(this.currentTest);
+        }
+    }
+    static loadLatest() {
+        this.disableBtn("btn-next");
+        this.loadTest();
+    }
+    static initializePage() {
+        this.tryLoadTestByGuid();
+        this.showTab("test-history", document.getElementById("tab-test-history"));
+    }
+    static showTab(idToShow, caller) {
+        TabsHelper.showTab(idToShow, caller, this.runPageTabsIds);
+    }
+}
+TestPageUpdater.runPageTabsIds = ["test-history", "test-output"];
 function loadRun1(guid) {
 }
 //# sourceMappingURL=ghpr.controller.js.map

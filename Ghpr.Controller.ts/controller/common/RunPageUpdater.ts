@@ -68,8 +68,8 @@ class RunPageUpdater {
         let list = "";
         const c = tests.length;
         for (let i = 0; i < c; i++) {
-            const r = tests[i];
-            list += `<li id=$run-${r.testInfo.guid}>Test #${c - i - 1}: <a href="./runs/?runGuid=${r.testInfo.guid}">${r.name}</a></li>`;
+            const t = tests[i];
+            list += `<li id=$test-${t.testInfo.guid}>Test #${c - i - 1}: <a href="./../tests/?testGuid=${t.testInfo.guid}&testFile=${t.testInfo.fileName}">${t.name}</a></li>`;
         }
         document.getElementById("all-tests").innerHTML = list;
     }
@@ -107,11 +107,22 @@ class RunPageUpdater {
         
     }
 
+    private static sorter(a: IItemInfo, b: IItemInfo): number {
+        if (a.finish > b.finish) {
+            return 1;
+        }
+        if (a.finish < b.finish) {
+            return -1;
+        }
+        return 0;
+    }
+
     private static loadRun(index: number = undefined): void {
         let runInfos: Array<IItemInfo>;
         var loader = new JsonLoader(PageType.TestRunPage);
         loader.loadRunsJson((response: string) => {
             runInfos = JSON.parse(response, loader.reviveRun);
+            runInfos.sort(this.sorter);
             this.runsCount = runInfos.length;
             if (index === undefined || index.toString() === "NaN") {
                 index = this.runsCount - 1;
@@ -137,6 +148,7 @@ class RunPageUpdater {
         var loader = new JsonLoader(PageType.TestRunPage);
         loader.loadRunsJson((response: string) => {
             runInfos = JSON.parse(response, loader.reviveRun);
+            runInfos.sort(this.sorter);
             this.runsCount = runInfos.length;
             const runInfo = runInfos.find((r) => r.guid === guid);
             if (runInfo != undefined) {

@@ -18,6 +18,8 @@
                     params.splice(index, 1);
                     params.push(p);
                 }
+            } else {
+                params.push(p);
             }
             window.history.pushState("", "", `?${params.join("&")}`);
         }

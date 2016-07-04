@@ -1,8 +1,11 @@
-﻿class TabsHelper {
+﻿///<reference path="./UrlHelper.ts"/>
+
+class TabsHelper {
     static showTab(idToShow: string, caller: HTMLElement, pageTabsIds: Array<string>): void {
         if (pageTabsIds.indexOf(idToShow) <= -1) {
             return;
         }
+        UrlHelper.insertParam("currentTab", idToShow);
         const tabs = document.getElementsByClassName("tabnav-tab");
         for (let i = 0; i < tabs.length; i++) {
             tabs[i].classList.remove("selected");

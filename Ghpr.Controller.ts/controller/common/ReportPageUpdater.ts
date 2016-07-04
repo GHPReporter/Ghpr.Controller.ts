@@ -111,6 +111,11 @@ class ReportPageUpdater {
             });
         });
     }
+    
+    static initializePage(): void {
+        this.updatePage();
+        this.showTab("runs-stats", document.getElementById("tab-runs-stats"));
+    }
 
     private static reportPageTabsIds: Array<string> = ["runs-stats", "runs-list"];
 
