@@ -242,21 +242,12 @@ class RunPageUpdater {
             this.setTestsList(tests);
         });
     }
-    static sorter(a, b) {
-        if (a.finish > b.finish) {
-            return 1;
-        }
-        if (a.finish < b.finish) {
-            return -1;
-        }
-        return 0;
-    }
     static loadRun(index = undefined) {
         let runInfos;
         var loader = new JsonLoader(PageType.TestRunPage);
         loader.loadRunsJson((response) => {
             runInfos = JSON.parse(response, loader.reviveRun);
-            runInfos.sort(this.sorter);
+            runInfos.sort(Sorter.itemInfoSorterByFinishDateFunc);
             this.runsCount = runInfos.length;
             if (index === undefined || index.toString() === "NaN") {
                 index = this.runsCount - 1;
@@ -281,7 +272,7 @@ class RunPageUpdater {
         var loader = new JsonLoader(PageType.TestRunPage);
         loader.loadRunsJson((response) => {
             runInfos = JSON.parse(response, loader.reviveRun);
-            runInfos.sort(this.sorter);
+            runInfos.sort(Sorter.itemInfoSorterByFinishDateFunc);
             this.runsCount = runInfos.length;
             const runInfo = runInfos.find((r) => r.guid === guid);
             if (runInfo != undefined) {
@@ -602,22 +593,13 @@ class TestPageUpdater {
             this.setTestsList(tests);
         });
     }
-    static sorter(a, b) {
-        if (a.finish > b.finish) {
-            return 1;
-        }
-        if (a.finish < b.finish) {
-            return -1;
-        }
-        return 0;
-    }
     static loadTest(index = undefined) {
         const guid = UrlHelper.getParam("testGuid");
         let testInfos;
         var loader = new JsonLoader(PageType.TestPage);
         loader.loadTestsJson(guid, (response) => {
             testInfos = JSON.parse(response, loader.reviveRun);
-            testInfos.sort(this.sorter);
+            testInfos.sort(Sorter.itemInfoSorterByFinishDateFunc);
             this.testVersionsCount = testInfos.length;
             if (index === undefined || index.toString() === "NaN") {
                 index = this.testVersionsCount - 1;
@@ -639,7 +621,7 @@ class TestPageUpdater {
         var loader = new JsonLoader(PageType.TestPage);
         loader.loadTestsJson(guid, (response) => {
             testInfos = JSON.parse(response, loader.reviveRun);
-            testInfos.sort(this.sorter);
+            testInfos.sort(Sorter.itemInfoSorterByFinishDateFunc);
             this.testVersionsCount = testInfos.length;
             const testInfo = testInfos.find((t) => t.fileName === fileName);
             if (testInfo != undefined) {
@@ -706,6 +688,17 @@ class TestPageUpdater {
     }
 }
 TestPageUpdater.runPageTabsIds = ["test-history", "test-output"];
+class Sorter {
+    static itemInfoSorterByFinishDateFunc(a, b) {
+        if (a.finish > b.finish) {
+            return 1;
+        }
+        if (a.finish < b.finish) {
+            return -1;
+        }
+        return 0;
+    }
+}
 function loadRun1(guid) {
 }
 //# sourceMappingURL=ghpr.controller.js.map

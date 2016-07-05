@@ -137,7 +137,7 @@ class RunPageUpdater {
         var loader = new JsonLoader(PageType.TestRunPage);
         loader.loadRunsJson((response: string) => {
             runInfos = JSON.parse(response, loader.reviveRun);
-            runInfos.sort(this.sorter);
+            runInfos.sort(Sorter.itemInfoSorterByFinishDateFunc);
             this.runsCount = runInfos.length;
             const runInfo = runInfos.find((r) => r.guid === guid);
             if (runInfo != undefined) {
