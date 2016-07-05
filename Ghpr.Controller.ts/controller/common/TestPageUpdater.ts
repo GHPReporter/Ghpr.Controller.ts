@@ -8,6 +8,7 @@
 ///<reference path="./Color.ts"/>
 ///<reference path="./PlotlyJs.ts"/>
 ///<reference path="./TabsHelper.ts"/>
+///<reference path="./TestRunHelper.ts"/>
 
 class TestPageUpdater {
 
@@ -15,9 +16,19 @@ class TestPageUpdater {
     static testVersionsCount: number;
 
     private static updateMainInformation(test: ITestRun): void {
-        document.getElementById("start").innerHTML = `Start datetime: ${DateFormatter.format(test.testInfo.start)}`;
-        document.getElementById("finish").innerHTML = `Finish datetime: ${DateFormatter.format(test.testInfo.finish)}`;
-        document.getElementById("duration").innerHTML = `Duration: ${test.testDuration}`;
+        console.log(test);
+        document.getElementById("page-title").innerHTML = `<b>Test:</b> ${test.name}`;
+        document.getElementById("name").innerHTML = `<b>Test name:</b> ${test.name}`;
+        document.getElementById("full-name").innerHTML = `<b>Full name:</b> ${test.fullName}`;
+        document.getElementById("result").innerHTML = `<b>Result:</b> ${TestRunHelper.getColoredResult(test)}`;
+        document.getElementById("start").innerHTML = `<b>Start datetime:</b> ${DateFormatter.format(test.testInfo.start)}`;
+        document.getElementById("finish").innerHTML = `<b>Finish datetime:</b> ${DateFormatter.format(test.testInfo.finish)}`;
+        document.getElementById("duration").innerHTML = `<b>Duration:</b> ${test.duration.toString()}`;
+        document.getElementById("message").innerHTML = `<b>Message:</b> ${TestRunHelper.getMessage(test)}`;
+    }
+
+    private static updateOutput(test: ITestRun): void {
+        document.getElementById("test-output-string").innerHTML = `${test.output}`;
     }
     
     private static updateSummary(run: IRun): void {
@@ -78,6 +89,7 @@ class TestPageUpdater {
             UrlHelper.insertParam("testGuid", test.testInfo.guid);
             UrlHelper.insertParam("testFile", test.testInfo.fileName);
             this.updateMainInformation(test);
+            document.getElementById("btn-back").setAttribute("href", `./../runs/?runGuid=${test.runGuid}`);
             //this.updateSummary(test);
             //this.updateTestsList(test);
         });

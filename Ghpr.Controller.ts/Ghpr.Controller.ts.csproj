@@ -49,6 +49,7 @@
     <TypeScriptCompile Include="controller\common\Sorter.ts" />
     <TypeScriptCompile Include="controller\common\TabsHelper.ts" />
     <TypeScriptCompile Include="controller\common\TestPageUpdater.ts" />
+    <TypeScriptCompile Include="controller\common\TestRunHelper.ts" />
     <TypeScriptCompile Include="controller\common\UrlHelper.ts" />
     <TypeScriptCompile Include="controller\enums\PageType.ts" />
     <TypeScriptCompile Include="controller\enums\TestResult.ts" />

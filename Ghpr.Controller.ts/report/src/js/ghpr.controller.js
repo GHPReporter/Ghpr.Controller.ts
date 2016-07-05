@@ -125,6 +125,9 @@ class TabsHelper {
 }
 class DateFormatter {
     static format(date) {
+        if (date < new Date(2000, 1)) {
+            return "-";
+        }
         const year = `${date.getFullYear()}`;
         const month = this.correct(`${date.getMonth() + 1}`);
         const day = this.correct(`${date.getDate()}`);
@@ -165,8 +168,8 @@ class RunPageUpdater {
         document.getElementById("finish").innerHTML = `Finish datetime: ${DateFormatter.format(run.runInfo.finish)}`;
         document.getElementById("duration").innerHTML = `Duration: ${DateFormatter.diff(run.runInfo.start, run.runInfo.finish)}`;
     }
-    static updateName(run) {
-        document.getElementById("run-name").innerHTML = run.name;
+    static updateTitle(run) {
+        document.getElementById("page-title").innerHTML = run.name;
     }
     static updateSummary(run) {
         const s = run.summary;
@@ -221,7 +224,7 @@ class RunPageUpdater {
             UrlHelper.insertParam("runGuid", run.runInfo.guid);
             this.updateTime(run);
             this.updateSummary(run);
-            this.updateName(run);
+            RunPageUpdater.updateTitle(run);
             this.updateTestsList(run);
         });
         return run;
@@ -231,6 +234,7 @@ class RunPageUpdater {
         const testStrings = new Array();
         const tests = new Array();
         var loader = new JsonLoader(PageType.TestRunPage);
+        document.getElementById("btn-back").setAttribute("href", `./../`);
         const files = run.testRunFiles;
         for (let i = 0; i < files.length; i++) {
             paths[i] = `./../tests/${files[i]}`;
@@ -331,8 +335,9 @@ class RunPageUpdater {
         this.loadRun();
     }
     static initializePage() {
+        const tab = UrlHelper.getParam("currentTab");
         this.tryLoadRunByGuid();
-        this.showTab("run-main-stats", document.getElementById("tab-run-main-stats"));
+        this.showTab(tab === "" ? "run-main-stats" : tab, document.getElementById("tab-run-main-stats"));
     }
     static showTab(idToShow, caller) {
         TabsHelper.showTab(idToShow, caller, this.runPageTabsIds);
@@ -409,8 +414,6 @@ class JsonLoader {
     reviveRun(key, value) {
         if (key === "start" || key === "finish")
             return new Date(value);
-        if (key === "duration")
-            return new Number(value);
         return value;
     }
 }
@@ -515,11 +518,63 @@ class ReportPageUpdater {
     }
 }
 ReportPageUpdater.reportPageTabsIds = ["runs-stats", "runs-list"];
+class TestRunHelper {
+    static getColor(test) {
+        const result = this.getResult(test);
+        switch (result) {
+            case TestResult.Passed:
+                return Color.passed;
+            case TestResult.Failed:
+                return Color.failed;
+            case TestResult.Broken:
+                return Color.broken;
+            case TestResult.Ignored:
+                return Color.ignored;
+            case TestResult.Inconclusive:
+                return Color.inconclusive;
+            default:
+                return Color.unknown;
+        }
+    }
+    static getResult(test) {
+        if (test.result.indexOf("Passed") > -1) {
+            return TestResult.Passed;
+        }
+        if (test.result.indexOf("Error") > -1) {
+            return TestResult.Broken;
+        }
+        if (test.result.indexOf("Failed") > -1 || test.result.indexOf("Failure") > -1) {
+            return TestResult.Failed;
+        }
+        if (test.result.indexOf("Inconclusive") > -1) {
+            return TestResult.Inconclusive;
+        }
+        if (test.result.indexOf("Ignored") > -1 || test.result.indexOf("Skipped") > -1) {
+            return TestResult.Ignored;
+        }
+        return TestResult.Unknown;
+    }
+    static getColoredResult(test) {
+        return `<span class="p-1" style= "background-color: ${this.getColor(test)};" > ${test.result} </span>`;
+    }
+    static getMessage(test) {
+        return test.testMessage === "" ? "-" : test.testMessage;
+    }
+}
 class TestPageUpdater {
     static updateMainInformation(test) {
-        document.getElementById("start").innerHTML = `Start datetime: ${DateFormatter.format(test.testInfo.start)}`;
-        document.getElementById("finish").innerHTML = `Finish datetime: ${DateFormatter.format(test.testInfo.finish)}`;
-        document.getElementById("duration").innerHTML = `Duration: ${test.testDuration}`;
+        console.log(test);
+        document.getElementById("page-title").innerHTML = `<b>Test:</b> ${test.name}`;
+        document.getElementById("name").innerHTML = `<b>Test name:</b> ${test.name}`;
+        document.getElementById("full-name").innerHTML = `<b>Full name:</b> ${test.fullName}`;
+        document.getElementById("result").innerHTML = `<b>Result:</b> ${TestRunHelper.getColoredResult(test)}`;
+        document.getElementById("start").innerHTML = `<b>Start datetime:</b> ${DateFormatter.format(test.testInfo.start)}`;
+        document.getElementById("finish").innerHTML = `<b>Finish datetime:</b> ${DateFormatter.format(test.testInfo.finish)}`;
+        document.getElementById("duration").innerHTML = `<b>Duration:</b> ${test.duration.toString()}`;
+        document.getElementById("message").innerHTML = `<b>Message:</b> ${TestRunHelper.getMessage(test)}`;
+    }
+    static updateOutput(test) {
+        document.getElementById("test-output-string").innerHTML = `${test.output}`;
     }
     static updateSummary(run) {
         const s = run.summary;
@@ -574,6 +629,7 @@ class TestPageUpdater {
             UrlHelper.insertParam("testGuid", test.testInfo.guid);
             UrlHelper.insertParam("testFile", test.testInfo.fileName);
             this.updateMainInformation(test);
+            document.getElementById("btn-back").setAttribute("href", `./../runs/?runGuid=${test.runGuid}`);
         });
         return test;
     }

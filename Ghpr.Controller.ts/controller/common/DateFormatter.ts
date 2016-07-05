@@ -1,5 +1,8 @@
 ﻿class DateFormatter {
     static format(date: Date): string {
+        if (date < new Date(2000, 1)) {
+            return "-";
+        }
         const year = `${date.getFullYear()}`;
         const month = this.correct(`${date.getMonth() + 1}`);
         const day = this.correct(`${date.getDate()}`);

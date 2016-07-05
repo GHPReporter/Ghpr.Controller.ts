@@ -16,13 +16,17 @@
     <div class="container">
         <div class="border-bottom p-3 mb-3">
             <div style="text-align: center;">
-                <h1 id="run-name">
+                <h1 id="page-title">
                     Test run report
                 </h1>
             </div>
         </div>
         <div class="tabnav">
             <div class="btn-group right">
+                <a id="btn-back" class="btn btn-sm" type="button" href="">
+                    <span class="octicon octicon-sign-in"></span>
+                    Back
+                </a>
                 <button id="btn-prev" class="btn btn-sm" type="button" onclick="RunPageUpdater.loadPrev();">
                     <span class="octicon octicon-arrow-left"></span>
                     Prev
@@ -36,8 +40,14 @@
                 </button>
             </div>
             <nav class="tabnav-tabs">
-                <a id="tab-run-main-stats" onclick="RunPageUpdater.showTab('run-main-stats', this);" class="tabnav-tab selected">Main statistics</a>
-                <a id="tab-run-test-list" onclick="RunPageUpdater.showTab('run-test-list', this);" class="tabnav-tab">Test list</a>
+                <a id="tab-run-main-stats" onclick="RunPageUpdater.showTab('run-main-stats', this);" class="tabnav-tab selected">
+                    <span class="octicon octicon-graph"></span>
+                    Main statistics
+                </a>
+                <a id="tab-run-test-list" onclick="RunPageUpdater.showTab('run-test-list', this);" class="tabnav-tab">
+                    <span class="octicon octicon-list-ordered"></span>
+                    Test list
+                </a>
             </nav>
         </div>
         <div class="columns border" id="run-main-stats" style="margin-top: -16px">

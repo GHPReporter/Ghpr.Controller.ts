@@ -6,7 +6,7 @@
 interface ITestRun {
     name: string;
     fullName: string;
-    testDuration: number;
+    duration: number;
     testInfo: IItemInfo;
     testStackTrace: string;
     testMessage: string;

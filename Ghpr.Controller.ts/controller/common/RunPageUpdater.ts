@@ -20,8 +20,8 @@ class RunPageUpdater {
         document.getElementById("duration").innerHTML = `Duration: ${DateFormatter.diff(run.runInfo.start, run.runInfo.finish)}`;
     }
 
-    private static updateName(run: IRun): void {
-        document.getElementById("run-name").innerHTML = run.name;
+    private static updateTitle(run: IRun): void {
+        document.getElementById("page-title").innerHTML = run.name;
     }
 
     private static updateSummary(run: IRun): void {
@@ -82,7 +82,7 @@ class RunPageUpdater {
             UrlHelper.insertParam("runGuid", run.runInfo.guid);
             this.updateTime(run);
             this.updateSummary(run);
-            this.updateName(run);
+            RunPageUpdater.updateTitle(run);
             this.updateTestsList(run);
         });
         return run;
@@ -93,6 +93,8 @@ class RunPageUpdater {
         const testStrings: Array<string> = new Array();
         const tests: Array<ITestRun> = new Array();
         var loader = new JsonLoader(PageType.TestRunPage);
+
+        document.getElementById("btn-back").setAttribute("href", `./../`);
 
         const files = run.testRunFiles;
         for (let i = 0; i < files.length; i++) {
@@ -200,8 +202,9 @@ class RunPageUpdater {
     }
 
     static initializePage(): void {
+        const tab = UrlHelper.getParam("currentTab");
         this.tryLoadRunByGuid();
-        this.showTab("run-main-stats", document.getElementById("tab-run-main-stats"));
+        this.showTab(tab === "" ? "run-main-stats" : tab, document.getElementById("tab-run-main-stats"));
     }
 
     private static runPageTabsIds: Array<string> = ["run-main-stats", "run-test-list"];
