@@ -46,6 +46,7 @@
     <TypeScriptCompile Include="controller\common\PlotlyJs.ts" />
     <TypeScriptCompile Include="controller\common\ReportPageUpdater.ts" />
     <TypeScriptCompile Include="controller\common\RunPageUpdater.ts" />
+    <TypeScriptCompile Include="controller\common\Sorter.ts" />
     <TypeScriptCompile Include="controller\common\TabsHelper.ts" />
     <TypeScriptCompile Include="controller\common\TestPageUpdater.ts" />
     <TypeScriptCompile Include="controller\common\UrlHelper.ts" />

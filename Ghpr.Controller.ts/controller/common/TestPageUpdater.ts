@@ -102,23 +102,13 @@ class TestPageUpdater {
         });
     }
 
-    private static sorter(a: IItemInfo, b: IItemInfo): number {
-        if (a.finish > b.finish) {
-            return 1;
-        }
-        if (a.finish < b.finish) {
-            return -1;
-        }
-        return 0;
-    }
-
     private static loadTest(index: number = undefined): void {
         const guid = UrlHelper.getParam("testGuid");
         let testInfos: Array<IItemInfo>;
         var loader = new JsonLoader(PageType.TestPage);
         loader.loadTestsJson(guid, (response: string) => {
             testInfos = JSON.parse(response, loader.reviveRun);
-            testInfos.sort(this.sorter);
+            testInfos.sort(Sorter.itemInfoSorterByFinishDateFunc);
             this.testVersionsCount = testInfos.length;
             if (index === undefined || index.toString() === "NaN") {
                 index = this.testVersionsCount - 1;
@@ -141,7 +131,7 @@ class TestPageUpdater {
         var loader = new JsonLoader(PageType.TestPage);
         loader.loadTestsJson(guid, (response: string) => {
             testInfos = JSON.parse(response, loader.reviveRun);
-            testInfos.sort(this.sorter);
+            testInfos.sort(Sorter.itemInfoSorterByFinishDateFunc);
             this.testVersionsCount = testInfos.length;
             const testInfo = testInfos.find((t) => t.fileName === fileName);
             if (testInfo != undefined) {

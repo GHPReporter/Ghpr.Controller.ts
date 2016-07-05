@@ -418,6 +418,8 @@ class JsonLoader {
     reviveRun(key, value) {
         if (key === "start" || key === "finish")
             return new Date(value);
+        if (key === "duration")
+            return new Number(value);
         return value;
     }
 }

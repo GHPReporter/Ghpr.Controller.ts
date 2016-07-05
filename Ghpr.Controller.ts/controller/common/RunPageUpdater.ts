@@ -104,17 +104,6 @@ class RunPageUpdater {
             }
             this.setTestsList(tests);
         });
-        
-    }
-
-    private static sorter(a: IItemInfo, b: IItemInfo): number {
-        if (a.finish > b.finish) {
-            return 1;
-        }
-        if (a.finish < b.finish) {
-            return -1;
-        }
-        return 0;
     }
 
     private static loadRun(index: number = undefined): void {
@@ -122,7 +111,7 @@ class RunPageUpdater {
         var loader = new JsonLoader(PageType.TestRunPage);
         loader.loadRunsJson((response: string) => {
             runInfos = JSON.parse(response, loader.reviveRun);
-            runInfos.sort(this.sorter);
+            runInfos.sort(Sorter.itemInfoSorterByFinishDateFunc);
             this.runsCount = runInfos.length;
             if (index === undefined || index.toString() === "NaN") {
                 index = this.runsCount - 1;
