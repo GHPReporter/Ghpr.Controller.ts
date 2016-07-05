@@ -35,7 +35,9 @@
             const paramToGet = params.find((par) => par.split("=")[0] === key);
             if (paramToGet != undefined) {
                 return paramToGet.split("=")[1];
-            } else return "";
+            } else {
+                return "";
+            }
         }
     }
 }

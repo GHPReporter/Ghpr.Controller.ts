@@ -33,34 +33,49 @@ class TestPageUpdater {
     }
 
     private static setTestHistory(tests: Array<ITestRun>): void {
-        const pieDiv = document.getElementById("test-history-chart");
-        Plotly.newPlot(pieDiv,
-            [
-                {
-                    values: [1,2,3,4,5,6],
-                    labels: ["Passed", "Broken", "Failed", "Inconclusive", "Ignored", "Unknown"],
-                    marker: {
-                        colors: [
-                            Color.passed, Color.broken, Color.failed, Color.inconclusive, Color.ignored, Color.unknown],
-                        line: {
-                            color: "white",
-                            width: 2
-                        }
-                    },
-                    outsidetextfont: {
-                        family: "Helvetica, arial, sans-serif"
-                    },
-                    textfont: {
-                        family: "Helvetica, arial, sans-serif"
-                    },
-                    textinfo: "label+percent",
-                    type: "pie",
-                    hole: 0.35
-                }
-            ],
+        const historyDiv = document.getElementById("test-history-chart");
+        let plotlyData = new Array();
+        const dataX: Array<Date> = new Array();
+        const dataY: Array<number> = new Array();
+        const tickvals: Array<number> = new Array();
+        const ticktext: Array<string> = new Array();
+
+        const c = tests.length;
+        for (let i = 0; i < c; i++) {
+            const t = tests[i];
+            dataX[i] = t.testInfo.finish;
+            const j = c - i - 1;
+            dataY[i] = t.duration;
+            tickvals[i] = j;
+            ticktext[i] = `test ${j}`;
+        }
+        const ty = "scatter";
+        const hi = "y";
+        plotlyData = [
             {
-                margin: { t: 0 }
-            });        
+                x: dataX,
+                y: dataY,
+                name: "Test history",
+                type: ty,
+                hoverinfo: hi,
+                marker: {
+                    color: [Color.unknown, Color.failed, Color.passed],
+                    size: 25,
+                    line: {
+                        color: Color.unknown,
+                        width: 4
+                    }
+                },
+                mode: "lines+markers",
+                line: {
+                    shape: "spline",
+                    color: Color.unknown,
+                    width: 8
+                }
+            }
+        ];
+        
+        Plotly.newPlot(historyDiv, plotlyData, {});      
     }
 
     private static updateTestPage(testGuid: string, fileName: string): ITestRun {
@@ -191,8 +206,9 @@ class TestPageUpdater {
     }
 
     static initializePage(): void {
-        const tab = UrlHelper.getParam("currentTab");
         this.tryLoadTestByGuid();
+        const tabFromUrl = UrlHelper.getParam("currentTab");
+        const tab = tabFromUrl === "" ? "test-history" : tabFromUrl;
         this.showTab(tab === "" ? "test-history" : tab, document.getElementById(`tab-${tab}`));
     }
 

@@ -101,8 +101,9 @@ class UrlHelper {
             if (paramToGet != undefined) {
                 return paramToGet.split("=")[1];
             }
-            else
+            else {
                 return "";
+            }
         }
     }
 }
@@ -404,9 +405,10 @@ class RunPageUpdater {
         this.loadRun();
     }
     static initializePage() {
-        const tab = UrlHelper.getParam("currentTab");
         this.tryLoadRunByGuid();
-        this.showTab(tab === "" ? "run-main-stats" : tab, document.getElementById(`tab-${tab}`));
+        const tabFromUrl = UrlHelper.getParam("currentTab");
+        const tab = tabFromUrl === "" ? "run-main-stats" : tabFromUrl;
+        this.showTab(tab, document.getElementById(`tab-${tab}`));
     }
     static showTab(idToShow, caller) {
         TabsHelper.showTab(idToShow, caller, this.runPageTabsIds);
@@ -574,32 +576,47 @@ class TestPageUpdater {
         document.getElementById("test-output-string").innerHTML = `${test.output}`;
     }
     static setTestHistory(tests) {
-        const pieDiv = document.getElementById("test-history-chart");
-        Plotly.newPlot(pieDiv, [
+        const historyDiv = document.getElementById("test-history-chart");
+        let plotlyData = new Array();
+        const dataX = new Array();
+        const dataY = new Array();
+        const tickvals = new Array();
+        const ticktext = new Array();
+        const c = tests.length;
+        for (let i = 0; i < c; i++) {
+            const t = tests[i];
+            dataX[i] = t.testInfo.finish;
+            const j = c - i - 1;
+            dataY[i] = t.duration;
+            tickvals[i] = j;
+            ticktext[i] = `test ${j}`;
+        }
+        const ty = "scatter";
+        const hi = "y";
+        plotlyData = [
             {
-                values: [1, 2, 3, 4, 5, 6],
-                labels: ["Passed", "Broken", "Failed", "Inconclusive", "Ignored", "Unknown"],
+                x: dataX,
+                y: dataY,
+                name: "Test history",
+                type: ty,
+                hoverinfo: hi,
                 marker: {
-                    colors: [
-                        Color.passed, Color.broken, Color.failed, Color.inconclusive, Color.ignored, Color.unknown],
+                    color: [Color.unknown, Color.failed, Color.passed],
+                    size: 25,
                     line: {
-                        color: "white",
-                        width: 2
+                        color: Color.unknown,
+                        width: 4
                     }
                 },
-                outsidetextfont: {
-                    family: "Helvetica, arial, sans-serif"
-                },
-                textfont: {
-                    family: "Helvetica, arial, sans-serif"
-                },
-                textinfo: "label+percent",
-                type: "pie",
-                hole: 0.35
+                mode: "lines+markers",
+                line: {
+                    shape: "spline",
+                    color: Color.unknown,
+                    width: 8
+                }
             }
-        ], {
-            margin: { t: 0 }
-        });
+        ];
+        Plotly.newPlot(historyDiv, plotlyData, {});
     }
     static updateTestPage(testGuid, fileName) {
         let test;
@@ -718,8 +735,9 @@ class TestPageUpdater {
         this.loadTest();
     }
     static initializePage() {
-        const tab = UrlHelper.getParam("currentTab");
         this.tryLoadTestByGuid();
+        const tabFromUrl = UrlHelper.getParam("currentTab");
+        const tab = tabFromUrl === "" ? "test-history" : tabFromUrl;
         this.showTab(tab === "" ? "test-history" : tab, document.getElementById(`tab-${tab}`));
     }
     static showTab(idToShow, caller) {

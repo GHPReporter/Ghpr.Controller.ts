@@ -199,9 +199,10 @@ class RunPageUpdater {
     }
 
     static initializePage(): void {
-        const tab = UrlHelper.getParam("currentTab");
         this.tryLoadRunByGuid();
-        this.showTab(tab === "" ? "run-main-stats" : tab, document.getElementById(`tab-${tab}`));
+        const tabFromUrl = UrlHelper.getParam("currentTab");
+        const tab = tabFromUrl === "" ? "run-main-stats" : tabFromUrl;
+        this.showTab(tab, document.getElementById(`tab-${tab}`));
     }
 
     private static runPageTabsIds: Array<string> = ["run-main-stats", "run-test-list"];
