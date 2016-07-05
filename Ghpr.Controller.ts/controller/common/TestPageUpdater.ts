@@ -14,6 +14,7 @@ class TestPageUpdater {
 
     static currentTest: number;
     static testVersionsCount: number;
+    static loader = new JsonLoader(PageType.TestPage);
 
     private static updateMainInformation(test: ITestRun): void {
         console.log(test);
@@ -30,22 +31,13 @@ class TestPageUpdater {
     private static updateOutput(test: ITestRun): void {
         document.getElementById("test-output-string").innerHTML = `${test.output}`;
     }
-    
-    private static updateSummary(run: IRun): void {
-        const s = run.summary;
-        document.getElementById("total").innerHTML = `Total: ${s.total}`;
-        document.getElementById("passed").innerHTML = `Success: ${s.success}`;
-        document.getElementById("broken").innerHTML = `Errors: ${s.errors}`;
-        document.getElementById("failed").innerHTML = `Failures: ${s.failures}`;
-        document.getElementById("inconclusive").innerHTML = `Inconclusive: ${s.inconclusive}`;
-        document.getElementById("ignored").innerHTML = `Ignored: ${s.ignored}`;
-        document.getElementById("unknown").innerHTML = `Unknown: ${s.unknown}`;
 
-        const pieDiv = document.getElementById("summary-pie");
+    private static setTestHistory(tests: Array<ITestRun>): void {
+        const pieDiv = document.getElementById("test-history-chart");
         Plotly.newPlot(pieDiv,
             [
                 {
-                    values: [s.success, s.errors, s.failures, s.inconclusive, s.ignored, s.unknown],
+                    values: [1,2,3,4,5,6],
                     labels: ["Passed", "Broken", "Failed", "Inconclusive", "Ignored", "Unknown"],
                     marker: {
                         colors: [
@@ -68,63 +60,56 @@ class TestPageUpdater {
             ],
             {
                 margin: { t: 0 }
-            });
-    }
-
-    private static setTestsList(tests: Array<ITestRun>): void {
-        let list = "";
-        const c = tests.length;
-        for (let i = 0; i < c; i++) {
-            const t = tests[i];
-            list += `<li id=$test-${t.testInfo.guid}>Test #${c - i - 1}: <a href="./../tests/?testGuid=${t.testInfo.guid}&testFile=${t.testInfo.fileName}">${t.name}</a></li>`;
-        }
-        document.getElementById("all-tests").innerHTML = list;
+            });        
     }
 
     private static updateTestPage(testGuid: string, fileName: string): ITestRun {
         let test: ITestRun;
-        var loader = new JsonLoader(PageType.TestPage);
-        loader.loadTestJson(testGuid, fileName, (response: string) => {
-            test = JSON.parse(response, loader.reviveRun);
+        this.loader.loadTestJson(testGuid, fileName, (response: string) => {
+            test = JSON.parse(response, JsonLoader.reviveRun);
             UrlHelper.insertParam("testGuid", test.testInfo.guid);
             UrlHelper.insertParam("testFile", test.testInfo.fileName);
             this.updateMainInformation(test);
             document.getElementById("btn-back").setAttribute("href", `./../runs/?runGuid=${test.runGuid}`);
-            //this.updateSummary(test);
-            //this.updateTestsList(test);
+            this.updateTestHistory();
         });
         return test;
     }
 
-    static updateTestsList(run: IRun): void {
+    static updateTestHistory(): void {
         const paths: Array<string> = new Array();
         const testStrings: Array<string> = new Array();
         const tests: Array<ITestRun> = new Array();
-        var loader = new JsonLoader(PageType.TestPage);
 
-        const files = run.testRunFiles;
-        for (let i = 0; i < files.length; i++) {
-            paths[i] = `./../tests/${files[i]}`;
-        }
-        loader.loadJsons(paths, 0, testStrings, (responses: Array<string>) => {
-            for (let i = 0; i < responses.length; i++) {
-                tests[i] = JSON.parse(responses[i], loader.reviveRun);
+        const guid = UrlHelper.getParam("testGuid");
+        let testInfos: Array<IItemInfo>;
+        this.loader.loadTestsJson(guid, (response: string) => {
+            testInfos = JSON.parse(response, JsonLoader.reviveRun);
+            testInfos.sort(Sorter.itemInfoSorterByFinishDateFunc);
+
+            for (let i = 0; i < testInfos.length; i++) {
+                paths[i] = `./${testInfos[i].guid}/${testInfos[i].fileName}`;
             }
-            this.setTestsList(tests);
+
+            this.loader.loadJsons(paths, 0, testStrings, (responses: Array<string>) => {
+                for (let i = 0; i < responses.length; i++) {
+                    tests[i] = JSON.parse(responses[i], JsonLoader.reviveRun);
+                }
+                this.setTestHistory(tests);
+            });
         });
+        
     }
 
     private static loadTest(index: number = undefined): void {
         const guid = UrlHelper.getParam("testGuid");
         let testInfos: Array<IItemInfo>;
-        var loader = new JsonLoader(PageType.TestPage);
-        loader.loadTestsJson(guid, (response: string) => {
-            testInfos = JSON.parse(response, loader.reviveRun);
+        this.loader.loadTestsJson(guid, (response: string) => {
+            testInfos = JSON.parse(response, JsonLoader.reviveRun);
             testInfos.sort(Sorter.itemInfoSorterByFinishDateFunc);
             this.testVersionsCount = testInfos.length;
             if (index === undefined || index.toString() === "NaN") {
                 index = this.testVersionsCount - 1;
-                this.currentTest = index;
             }
             if (index === 0) {
                 this.disableBtn("btn-prev");
@@ -132,7 +117,8 @@ class TestPageUpdater {
             if (index === testInfos.length - 1) {
                 this.disableBtn("btn-next");
             }
-            TestPageUpdater.updateTestPage(testInfos[index].guid, testInfos[index].fileName);
+            this.currentTest = index;
+            this.updateTestPage(testInfos[index].guid, testInfos[index].fileName);
         });
     }
 
@@ -140,9 +126,8 @@ class TestPageUpdater {
         const guid = UrlHelper.getParam("testGuid");
         const fileName = UrlHelper.getParam("testFile");
         let testInfos: Array<IItemInfo>;
-        var loader = new JsonLoader(PageType.TestPage);
-        loader.loadTestsJson(guid, (response: string) => {
-            testInfos = JSON.parse(response, loader.reviveRun);
+        this.loader.loadTestsJson(guid, (response: string) => {
+            testInfos = JSON.parse(response, JsonLoader.reviveRun);
             testInfos.sort(Sorter.itemInfoSorterByFinishDateFunc);
             this.testVersionsCount = testInfos.length;
             const testInfo = testInfos.find((t) => t.fileName === fileName);
@@ -206,8 +191,9 @@ class TestPageUpdater {
     }
 
     static initializePage(): void {
+        const tab = UrlHelper.getParam("currentTab");
         this.tryLoadTestByGuid();
-        this.showTab("test-history", document.getElementById("tab-test-history"));
+        this.showTab(tab === "" ? "test-history" : tab, document.getElementById(`tab-${tab}`));
     }
 
     private static runPageTabsIds: Array<string> = ["test-history", "test-output"];

@@ -13,6 +13,7 @@ class RunPageUpdater {
 
     static currentRun: number;
     static runsCount: number; 
+    static loader = new JsonLoader(PageType.TestRunPage);
 
     private static updateTime(run: IRun): void {
         document.getElementById("start").innerHTML = `Start datetime: ${DateFormatter.format(run.runInfo.start)}`;
@@ -76,9 +77,8 @@ class RunPageUpdater {
     
     private static updateRunPage(runGuid: string): IRun {
         let run: IRun;
-        var loader = new JsonLoader(PageType.TestRunPage);
-        loader.loadRunJson(runGuid, (response: string) => {
-            run = JSON.parse(response, loader.reviveRun);
+        this.loader.loadRunJson(runGuid, (response: string) => {
+            run = JSON.parse(response, JsonLoader.reviveRun);
             UrlHelper.insertParam("runGuid", run.runInfo.guid);
             this.updateTime(run);
             this.updateSummary(run);
@@ -92,7 +92,6 @@ class RunPageUpdater {
         const paths: Array<string> = new Array();
         const testStrings: Array<string> = new Array();
         const tests: Array<ITestRun> = new Array();
-        var loader = new JsonLoader(PageType.TestRunPage);
 
         document.getElementById("btn-back").setAttribute("href", `./../`);
 
@@ -100,9 +99,9 @@ class RunPageUpdater {
         for (let i = 0; i < files.length; i++) {
             paths[i] = `./../tests/${files[i]}`;
         }
-        loader.loadJsons(paths, 0, testStrings, (responses: Array<string>) => {
+        this.loader.loadJsons(paths, 0, testStrings, (responses: Array<string>) => {
             for (let i = 0; i < responses.length; i++) {
-                tests[i] = JSON.parse(responses[i], loader.reviveRun);
+                tests[i] = JSON.parse(responses[i], JsonLoader.reviveRun);
             }
             this.setTestsList(tests);
         });
@@ -110,14 +109,12 @@ class RunPageUpdater {
 
     private static loadRun(index: number = undefined): void {
         let runInfos: Array<IItemInfo>;
-        var loader = new JsonLoader(PageType.TestRunPage);
-        loader.loadRunsJson((response: string) => {
-            runInfos = JSON.parse(response, loader.reviveRun);
+        this.loader.loadRunsJson((response: string) => {
+            runInfos = JSON.parse(response, JsonLoader.reviveRun);
             runInfos.sort(Sorter.itemInfoSorterByFinishDateFunc);
             this.runsCount = runInfos.length;
             if (index === undefined || index.toString() === "NaN") {
                 index = this.runsCount - 1;
-                this.currentRun = index;
             }
             if (index === 0) {
                 this.disableBtn("btn-prev");
@@ -125,6 +122,7 @@ class RunPageUpdater {
             if (index === runInfos.length - 1) {
                 this.disableBtn("btn-next");
             }
+            this.currentRun = index;
             this.updateRunPage(runInfos[index].guid);
         });
     }
@@ -136,9 +134,8 @@ class RunPageUpdater {
             return;
         }
         let runInfos: Array<IItemInfo>;
-        var loader = new JsonLoader(PageType.TestRunPage);
-        loader.loadRunsJson((response: string) => {
-            runInfos = JSON.parse(response, loader.reviveRun);
+        this.loader.loadRunsJson((response: string) => {
+            runInfos = JSON.parse(response, JsonLoader.reviveRun);
             runInfos.sort(Sorter.itemInfoSorterByFinishDateFunc);
             this.runsCount = runInfos.length;
             const runInfo = runInfos.find((r) => r.guid === guid);
@@ -204,7 +201,7 @@ class RunPageUpdater {
     static initializePage(): void {
         const tab = UrlHelper.getParam("currentTab");
         this.tryLoadRunByGuid();
-        this.showTab(tab === "" ? "run-main-stats" : tab, document.getElementById("tab-run-main-stats"));
+        this.showTab(tab === "" ? "run-main-stats" : tab, document.getElementById(`tab-${tab}`));
     }
 
     private static runPageTabsIds: Array<string> = ["run-main-stats", "run-test-list"];

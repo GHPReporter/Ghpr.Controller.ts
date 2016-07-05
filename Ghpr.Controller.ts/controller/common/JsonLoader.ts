@@ -1,6 +1,5 @@
 ﻿///<reference path="./../interfaces/IRun.ts"/>
 ///<reference path="./../enums/PageType.ts"/>
-///<reference path="./RunPageUpdater.ts"/>
 ///<reference path="./PathsHelper.ts"/>
 
 class JsonLoader {
@@ -78,7 +77,7 @@ class JsonLoader {
         req.send(null);
     }
 
-    reviveRun(key: any, value: any): any {
+    static reviveRun(key: any, value: any): any {
         if (key === "start" || key === "finish") return new Date(value);
         //if (key === "duration") return new Number(value);
         return value;

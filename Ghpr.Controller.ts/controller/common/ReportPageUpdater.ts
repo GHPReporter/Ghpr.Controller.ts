@@ -8,6 +8,9 @@
 ///<reference path="./PlotlyJs.ts"/>
 
 class ReportPageUpdater {
+
+    static loader = new JsonLoader(PageType.TestRunsPage);
+
     private static updateFields(run: IRun): void {
         document.getElementById("start").innerHTML = `Start datetime: ${DateFormatter.format(run.runInfo.start)}`;
         document.getElementById("finish").innerHTML = `Finish datetime: ${DateFormatter.format(run.runInfo.finish)}`;
@@ -76,7 +79,7 @@ class ReportPageUpdater {
             { x: ignoredX, y: ignoredY, name: "ignored",      type: t, hoverinfo: hi, marker: { color: Color.ignored } },
             { x: brokenX,  y: brokenY,  name: "broken",       type: t, hoverinfo: hi, marker: { color: Color.broken } },
             { x: failedX,  y: failedY,  name: "failed",       type: t, hoverinfo: hi, marker: { color: Color.failed } },
-            { x: passedX,  y: passedY,   name: "passed",      type: t, hoverinfo: hi, marker: { color: Color.passed } }
+            { x: passedX,  y: passedY,  name: "passed",       type: t, hoverinfo: hi, marker: { color: Color.passed } }
         ];
 
         const pieDiv = document.getElementById("runs-bars");
@@ -95,15 +98,14 @@ class ReportPageUpdater {
         const paths: Array<string> = new Array();
         const r: Array<string> = new Array();
         const runs: Array<IRun> = new Array();
-        var loader = new JsonLoader(PageType.TestRunsPage);
-        loader.loadRunsJson((response: string) => {
-            runInfos = JSON.parse(response, loader.reviveRun);
+        this.loader.loadRunsJson((response: string) => {
+            runInfos = JSON.parse(response, JsonLoader.reviveRun);
             for (let i = 0; i < runInfos.length; i++) {
                 paths[i] = `runs/run_${runInfos[i].guid}.json`;
             }
-            loader.loadJsons(paths, 0, r, (responses: Array<string>) => {
+            this.loader.loadJsons(paths, 0, r, (responses: Array<string>) => {
                 for (let i = 0; i < responses.length; i++) {
-                    runs[i] = JSON.parse(responses[i], loader.reviveRun);
+                    runs[i] = JSON.parse(responses[i], JsonLoader.reviveRun);
                 }
                 this.updateFields(runs[runs.length - 1]);
                 this.updatePlotlyBars(runs);
