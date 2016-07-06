@@ -4,11 +4,11 @@
             return "-";
         }
         const year = `${date.getFullYear()}`;
-        const month = this.correct(`${date.getMonth() + 1}`);
-        const day = this.correct(`${date.getDate()}`);
-        const hour = this.correct(`${date.getHours()}`);
-        const minute = this.correct(`${date.getMinutes()}`);
-        const second = this.correct(`${date.getSeconds()}`);
+        const month = DateFormatter.correctString(`${date.getMonth() + 1}`);
+        const day = DateFormatter.correctString(`${date.getDate()}`);
+        const hour = DateFormatter.correctString(`${date.getHours()}`);
+        const minute = DateFormatter.correctString(`${date.getMinutes()}`);
+        const second = DateFormatter.correctString(`${date.getSeconds()}`);
         return year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
     }
 
@@ -23,7 +23,7 @@
         return readableDifference;
     }
 
-    static correct(s: string): string {
+    static correctString(s: string): string {
         if (s.length === 1) {
             return `0${s}`;
         } else return s;

@@ -16,9 +16,9 @@ class RunPageUpdater {
     static loader = new JsonLoader(PageType.TestRunPage);
 
     private static updateTime(run: IRun): void {
-        document.getElementById("start").innerHTML = `Start datetime: ${DateFormatter.format(run.runInfo.start)}`;
-        document.getElementById("finish").innerHTML = `Finish datetime: ${DateFormatter.format(run.runInfo.finish)}`;
-        document.getElementById("duration").innerHTML = `Duration: ${DateFormatter.diff(run.runInfo.start, run.runInfo.finish)}`;
+        document.getElementById("start").innerHTML = `<b>Start datetime:</b> ${DateFormatter.format(run.runInfo.start)}`;
+        document.getElementById("finish").innerHTML = `<b>Finish datetime:</b> ${DateFormatter.format(run.runInfo.finish)}`;
+        document.getElementById("duration").innerHTML = `<b>Duration:</b> ${DateFormatter.diff(run.runInfo.start, run.runInfo.finish)}`;
     }
 
     private static updateTitle(run: IRun): void {
@@ -27,13 +27,13 @@ class RunPageUpdater {
 
     private static updateSummary(run: IRun): void {
         const s = run.summary;
-        document.getElementById("total").innerHTML = `Total: ${s.total}`;
-        document.getElementById("passed").innerHTML = `Success: ${s.success}`;
-        document.getElementById("broken").innerHTML = `Errors: ${s.errors}`;
-        document.getElementById("failed").innerHTML = `Failures: ${s.failures}`;
-        document.getElementById("inconclusive").innerHTML = `Inconclusive: ${s.inconclusive}`;
-        document.getElementById("ignored").innerHTML = `Ignored: ${s.ignored}`;
-        document.getElementById("unknown").innerHTML = `Unknown: ${s.unknown}`;
+        document.getElementById("total").innerHTML = `<b>Total:</b> ${s.total}`;
+        document.getElementById("passed").innerHTML = `<b>Success:</b> ${s.success}`;
+        document.getElementById("broken").innerHTML = `<b>Errors:</b> ${s.errors}`;
+        document.getElementById("failed").innerHTML = `<b>Failures:</b> ${s.failures}`;
+        document.getElementById("inconclusive").innerHTML = `<b>Inconclusive:</b> ${s.inconclusive}`;
+        document.getElementById("ignored").innerHTML = `<b>Ignored:</b> ${s.ignored}`;
+        document.getElementById("unknown").innerHTML = `<b>Unknown:</b> ${s.unknown}`;
         
         const pieDiv = document.getElementById("summary-pie");
         Plotly.newPlot(pieDiv,

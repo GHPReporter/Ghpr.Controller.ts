@@ -203,11 +203,11 @@ class DateFormatter {
             return "-";
         }
         const year = `${date.getFullYear()}`;
-        const month = this.correct(`${date.getMonth() + 1}`);
-        const day = this.correct(`${date.getDate()}`);
-        const hour = this.correct(`${date.getHours()}`);
-        const minute = this.correct(`${date.getMinutes()}`);
-        const second = this.correct(`${date.getSeconds()}`);
+        const month = DateFormatter.correctString(`${date.getMonth() + 1}`);
+        const day = DateFormatter.correctString(`${date.getDate()}`);
+        const hour = DateFormatter.correctString(`${date.getHours()}`);
+        const minute = DateFormatter.correctString(`${date.getMinutes()}`);
+        const second = DateFormatter.correctString(`${date.getSeconds()}`);
         return year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
     }
     static diff(start, finish) {
@@ -220,7 +220,7 @@ class DateFormatter {
         const readableDifference = dHours + ":" + dMins + ":" + dSecs + "." + dMilliSecs;
         return readableDifference;
     }
-    static correct(s) {
+    static correctString(s) {
         if (s.length === 1) {
             return `0${s}`;
         }
@@ -238,22 +238,22 @@ Color.inconclusive = "#D6FAF7";
 Color.unknown = "#bdbdbd";
 class RunPageUpdater {
     static updateTime(run) {
-        document.getElementById("start").innerHTML = `Start datetime: ${DateFormatter.format(run.runInfo.start)}`;
-        document.getElementById("finish").innerHTML = `Finish datetime: ${DateFormatter.format(run.runInfo.finish)}`;
-        document.getElementById("duration").innerHTML = `Duration: ${DateFormatter.diff(run.runInfo.start, run.runInfo.finish)}`;
+        document.getElementById("start").innerHTML = `<b>Start datetime:</b> ${DateFormatter.format(run.runInfo.start)}`;
+        document.getElementById("finish").innerHTML = `<b>Finish datetime:</b> ${DateFormatter.format(run.runInfo.finish)}`;
+        document.getElementById("duration").innerHTML = `<b>Duration:</b> ${DateFormatter.diff(run.runInfo.start, run.runInfo.finish)}`;
     }
     static updateTitle(run) {
         document.getElementById("page-title").innerHTML = run.name;
     }
     static updateSummary(run) {
         const s = run.summary;
-        document.getElementById("total").innerHTML = `Total: ${s.total}`;
-        document.getElementById("passed").innerHTML = `Success: ${s.success}`;
-        document.getElementById("broken").innerHTML = `Errors: ${s.errors}`;
-        document.getElementById("failed").innerHTML = `Failures: ${s.failures}`;
-        document.getElementById("inconclusive").innerHTML = `Inconclusive: ${s.inconclusive}`;
-        document.getElementById("ignored").innerHTML = `Ignored: ${s.ignored}`;
-        document.getElementById("unknown").innerHTML = `Unknown: ${s.unknown}`;
+        document.getElementById("total").innerHTML = `<b>Total:</b> ${s.total}`;
+        document.getElementById("passed").innerHTML = `<b>Success:</b> ${s.success}`;
+        document.getElementById("broken").innerHTML = `<b>Errors:</b> ${s.errors}`;
+        document.getElementById("failed").innerHTML = `<b>Failures:</b> ${s.failures}`;
+        document.getElementById("inconclusive").innerHTML = `<b>Inconclusive:</b> ${s.inconclusive}`;
+        document.getElementById("ignored").innerHTML = `<b>Ignored:</b> ${s.ignored}`;
+        document.getElementById("unknown").innerHTML = `<b>Unknown:</b> ${s.unknown}`;
         const pieDiv = document.getElementById("summary-pie");
         Plotly.newPlot(pieDiv, [
             {
@@ -418,9 +418,9 @@ RunPageUpdater.loader = new JsonLoader(PageType.TestRunPage);
 RunPageUpdater.runPageTabsIds = ["run-main-stats", "run-test-list"];
 class ReportPageUpdater {
     static updateFields(run) {
-        document.getElementById("start").innerHTML = `Start datetime: ${DateFormatter.format(run.runInfo.start)}`;
-        document.getElementById("finish").innerHTML = `Finish datetime: ${DateFormatter.format(run.runInfo.finish)}`;
-        document.getElementById("duration").innerHTML = `Duration: ${DateFormatter.diff(run.runInfo.start, run.runInfo.finish)}`;
+        document.getElementById("start").innerHTML = `<b>Start datetime:</b> ${DateFormatter.format(run.runInfo.start)}`;
+        document.getElementById("finish").innerHTML = `<b>Finish datetime:</b> ${DateFormatter.format(run.runInfo.finish)}`;
+        document.getElementById("duration").innerHTML = `<b>Duration:</b> ${DateFormatter.diff(run.runInfo.start, run.runInfo.finish)}`;
     }
     static updateRunsList(runs) {
         let list = "";
@@ -432,7 +432,7 @@ class ReportPageUpdater {
         document.getElementById("all-runs").innerHTML = list;
     }
     static updatePlotlyBars(runs) {
-        document.getElementById("total").innerHTML = `Total: ${runs.length}`;
+        document.getElementById("total").innerHTML = `<b>Total:</b> ${runs.length}`;
         let plotlyData = new Array();
         const passedY = new Array();
         const failedY = new Array();
@@ -479,12 +479,17 @@ class ReportPageUpdater {
         ];
         const pieDiv = document.getElementById("runs-bars");
         Plotly.newPlot(pieDiv, plotlyData, {
-            barmode: "stack",
-            bargap: 0.01,
+            title: "Runs statistics",
             xaxis: {
                 tickvals: tickvals,
-                ticktext: ticktext
-            }
+                ticktext: ticktext,
+                title: "Runs"
+            },
+            yaxis: {
+                title: "Tests number"
+            },
+            barmode: "stack",
+            bargap: 0.01
         });
     }
     static updatePage(index = undefined) {
@@ -518,8 +523,8 @@ class ReportPageUpdater {
 ReportPageUpdater.loader = new JsonLoader(PageType.TestRunsPage);
 ReportPageUpdater.reportPageTabsIds = ["runs-stats", "runs-list"];
 class TestRunHelper {
-    static getColor(test) {
-        const result = this.getResult(test);
+    static getColor(t) {
+        const result = this.getResult(t);
         switch (result) {
             case TestResult.Passed:
                 return Color.passed;
@@ -535,45 +540,52 @@ class TestRunHelper {
                 return Color.unknown;
         }
     }
-    static getResult(test) {
-        if (test.result.indexOf("Passed") > -1) {
+    static getResult(t) {
+        if (t.result.indexOf("Passed") > -1) {
             return TestResult.Passed;
         }
-        if (test.result.indexOf("Error") > -1) {
+        if (t.result.indexOf("Error") > -1) {
             return TestResult.Broken;
         }
-        if (test.result.indexOf("Failed") > -1 || test.result.indexOf("Failure") > -1) {
+        if (t.result.indexOf("Failed") > -1 || t.result.indexOf("Failure") > -1) {
             return TestResult.Failed;
         }
-        if (test.result.indexOf("Inconclusive") > -1) {
+        if (t.result.indexOf("Inconclusive") > -1) {
             return TestResult.Inconclusive;
         }
-        if (test.result.indexOf("Ignored") > -1 || test.result.indexOf("Skipped") > -1) {
+        if (t.result.indexOf("Ignored") > -1 || t.result.indexOf("Skipped") > -1) {
             return TestResult.Ignored;
         }
         return TestResult.Unknown;
     }
-    static getColoredResult(test) {
-        return `<span class="p-1" style= "background-color: ${this.getColor(test)};" > ${test.result} </span>`;
+    static getColoredResult(t) {
+        return `<span class="p-1" style= "background-color: ${this.getColor(t)};" > ${t.result} </span>`;
     }
-    static getMessage(test) {
-        return test.testMessage === "" ? "-" : test.testMessage;
+    static getMessage(t) {
+        return t.testMessage === "" ? "-" : t.testMessage;
+    }
+    static getStackTrace(t) {
+        return t.testStackTrace === "" ? "-" : t.testStackTrace;
     }
 }
 class TestPageUpdater {
-    static updateMainInformation(test) {
-        console.log(test);
-        document.getElementById("page-title").innerHTML = `<b>Test:</b> ${test.name}`;
-        document.getElementById("name").innerHTML = `<b>Test name:</b> ${test.name}`;
-        document.getElementById("full-name").innerHTML = `<b>Full name:</b> ${test.fullName}`;
-        document.getElementById("result").innerHTML = `<b>Result:</b> ${TestRunHelper.getColoredResult(test)}`;
-        document.getElementById("start").innerHTML = `<b>Start datetime:</b> ${DateFormatter.format(test.testInfo.start)}`;
-        document.getElementById("finish").innerHTML = `<b>Finish datetime:</b> ${DateFormatter.format(test.testInfo.finish)}`;
-        document.getElementById("duration").innerHTML = `<b>Duration:</b> ${test.duration.toString()}`;
-        document.getElementById("message").innerHTML = `<b>Message:</b> ${TestRunHelper.getMessage(test)}`;
+    static updateMainInformation(t) {
+        console.log(t);
+        document.getElementById("page-title").innerHTML = `<b>Test:</b> ${t.name}`;
+        document.getElementById("name").innerHTML = `<b>Test name:</b> ${t.name}`;
+        document.getElementById("full-name").innerHTML = `<b>Full name:</b> ${t.fullName}`;
+        document.getElementById("result").innerHTML = `<b>Result:</b> ${TestRunHelper.getColoredResult(t)}`;
+        document.getElementById("start").innerHTML = `<b>Start datetime:</b> ${DateFormatter.format(t.testInfo.start)}`;
+        document.getElementById("finish").innerHTML = `<b>Finish datetime:</b> ${DateFormatter.format(t.testInfo.finish)}`;
+        document.getElementById("duration").innerHTML = `<b>Duration:</b> ${t.duration.toString()}`;
+        document.getElementById("message").innerHTML = `<b>Message:</b> ${TestRunHelper.getMessage(t)}`;
     }
-    static updateOutput(test) {
-        document.getElementById("test-output-string").innerHTML = `${test.output}`;
+    static updateOutput(t) {
+        document.getElementById("test-output-string").innerHTML = `<b>Test log:</b><br> ${t.output}`;
+    }
+    static updateFailure(t) {
+        document.getElementById("test-message").innerHTML = `<b>Message:</b><br> ${TestRunHelper.getMessage(t)}`;
+        document.getElementById("test-stack-trace").innerHTML = `<b>Stack trace:</b><br> ${TestRunHelper.getStackTrace(t)}`;
     }
     static setTestHistory(tests) {
         const historyDiv = document.getElementById("test-history-chart");
@@ -613,7 +625,7 @@ class TestPageUpdater {
         const currentTest = {
             x: [dataX[index]],
             y: [dataY[index]],
-            name: "Current test: ",
+            name: "Current test",
             type: "scatter",
             mode: "markers",
             hoverinfo: "name",
@@ -644,6 +656,7 @@ class TestPageUpdater {
             UrlHelper.insertParam("testFile", test.testInfo.fileName);
             this.updateMainInformation(test);
             this.updateOutput(test);
+            this.updateFailure(test);
             document.getElementById("btn-back").setAttribute("href", `./../runs/?runGuid=${test.runGuid}`);
             this.updateTestHistory();
         });
@@ -764,7 +777,7 @@ class TestPageUpdater {
     }
 }
 TestPageUpdater.loader = new JsonLoader(PageType.TestPage);
-TestPageUpdater.runPageTabsIds = ["test-history", "test-output"];
+TestPageUpdater.runPageTabsIds = ["test-history", "test-output", "test-failure"];
 class Sorter {
     static itemInfoSorterByFinishDateFunc(a, b) {
         if (a.finish > b.finish) {

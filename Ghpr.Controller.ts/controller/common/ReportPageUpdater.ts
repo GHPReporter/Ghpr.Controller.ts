@@ -12,9 +12,9 @@ class ReportPageUpdater {
     static loader = new JsonLoader(PageType.TestRunsPage);
 
     private static updateFields(run: IRun): void {
-        document.getElementById("start").innerHTML = `Start datetime: ${DateFormatter.format(run.runInfo.start)}`;
-        document.getElementById("finish").innerHTML = `Finish datetime: ${DateFormatter.format(run.runInfo.finish)}`;
-        document.getElementById("duration").innerHTML = `Duration: ${DateFormatter.diff(run.runInfo.start, run.runInfo.finish)}`;
+        document.getElementById("start").innerHTML = `<b>Start datetime:</b> ${DateFormatter.format(run.runInfo.start)}`;
+        document.getElementById("finish").innerHTML = `<b>Finish datetime:</b> ${DateFormatter.format(run.runInfo.finish)}`;
+        document.getElementById("duration").innerHTML = `<b>Duration:</b> ${DateFormatter.diff(run.runInfo.start, run.runInfo.finish)}`;
     }
 
     private static updateRunsList(runs: Array<IRun>): void {
@@ -29,7 +29,7 @@ class ReportPageUpdater {
     
     private static updatePlotlyBars(runs: Array<IRun>): void {
 
-        document.getElementById("total").innerHTML = `Total: ${runs.length}`;
+        document.getElementById("total").innerHTML = `<b>Total:</b> ${runs.length}`;
         
         let plotlyData = new Array();
         const passedY: Array<number> = new Array();
@@ -84,12 +84,17 @@ class ReportPageUpdater {
 
         const pieDiv = document.getElementById("runs-bars");
         Plotly.newPlot(pieDiv, plotlyData, {
-                barmode: "stack",
-                bargap: 0.01,
-                xaxis: {
-                    tickvals: tickvals,
-                    ticktext: ticktext
-                }
+            title: "Runs statistics",
+            xaxis: {
+                tickvals: tickvals,
+                ticktext: ticktext,
+                title: "Runs"
+            },
+            yaxis: {
+                title: "Tests number"
+            },
+            barmode: "stack",
+            bargap: 0.01
         });
     }
     

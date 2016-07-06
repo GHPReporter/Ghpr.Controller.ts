@@ -16,20 +16,25 @@ class TestPageUpdater {
     static testVersionsCount: number;
     static loader = new JsonLoader(PageType.TestPage);
 
-    private static updateMainInformation(test: ITestRun): void {
-        console.log(test);
-        document.getElementById("page-title").innerHTML = `<b>Test:</b> ${test.name}`;
-        document.getElementById("name").innerHTML = `<b>Test name:</b> ${test.name}`;
-        document.getElementById("full-name").innerHTML = `<b>Full name:</b> ${test.fullName}`;
-        document.getElementById("result").innerHTML = `<b>Result:</b> ${TestRunHelper.getColoredResult(test)}`;
-        document.getElementById("start").innerHTML = `<b>Start datetime:</b> ${DateFormatter.format(test.testInfo.start)}`;
-        document.getElementById("finish").innerHTML = `<b>Finish datetime:</b> ${DateFormatter.format(test.testInfo.finish)}`;
-        document.getElementById("duration").innerHTML = `<b>Duration:</b> ${test.duration.toString()}`;
-        document.getElementById("message").innerHTML = `<b>Message:</b> ${TestRunHelper.getMessage(test)}`;
+    private static updateMainInformation(t: ITestRun): void {
+        console.log(t);
+        document.getElementById("page-title").innerHTML = `<b>Test:</b> ${t.name}`;
+        document.getElementById("name").innerHTML = `<b>Test name:</b> ${t.name}`;
+        document.getElementById("full-name").innerHTML = `<b>Full name:</b> ${t.fullName}`;
+        document.getElementById("result").innerHTML = `<b>Result:</b> ${TestRunHelper.getColoredResult(t)}`;
+        document.getElementById("start").innerHTML = `<b>Start datetime:</b> ${DateFormatter.format(t.testInfo.start)}`;
+        document.getElementById("finish").innerHTML = `<b>Finish datetime:</b> ${DateFormatter.format(t.testInfo.finish)}`;
+        document.getElementById("duration").innerHTML = `<b>Duration:</b> ${t.duration.toString()}`;
+        document.getElementById("message").innerHTML = `<b>Message:</b> ${TestRunHelper.getMessage(t)}`;
     }
 
-    private static updateOutput(test: ITestRun): void {
-        document.getElementById("test-output-string").innerHTML = `${test.output}`;
+    private static updateOutput(t: ITestRun): void {
+        document.getElementById("test-output-string").innerHTML = `<b>Test log:</b><br> ${t.output}`;
+    }
+
+    private static updateFailure(t: ITestRun): void {
+        document.getElementById("test-message").innerHTML = `<b>Message:</b><br> ${TestRunHelper.getMessage(t)}`;
+        document.getElementById("test-stack-trace").innerHTML = `<b>Stack trace:</b><br> ${TestRunHelper.getStackTrace(t)}`;
     }
 
     private static setTestHistory(tests: Array<ITestRun>): void {
@@ -71,7 +76,7 @@ class TestPageUpdater {
         const currentTest = {
             x: [dataX[index]],
             y: [dataY[index]],
-            name: "Current test: ",
+            name: "Current test",
             type: "scatter",
             mode: "markers",
             hoverinfo: "name",
@@ -105,6 +110,7 @@ class TestPageUpdater {
             UrlHelper.insertParam("testFile", test.testInfo.fileName);
             this.updateMainInformation(test);
             this.updateOutput(test);
+            this.updateFailure(test);
             document.getElementById("btn-back").setAttribute("href", `./../runs/?runGuid=${test.runGuid}`);
             this.updateTestHistory();
         });
@@ -232,7 +238,7 @@ class TestPageUpdater {
         this.showTab(tab === "" ? "test-history" : tab, document.getElementById(`tab-${tab}`));
     }
 
-    private static runPageTabsIds: Array<string> = ["test-history", "test-output"];
+    private static runPageTabsIds: Array<string> = ["test-history", "test-output", "test-failure"];
 
     static showTab(idToShow: string, caller: HTMLElement): void {
         TabsHelper.showTab(idToShow, caller, this.runPageTabsIds);

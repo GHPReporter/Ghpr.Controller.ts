@@ -48,6 +48,10 @@
                     <span class="octicon octicon-file-text"></span>
                     Test output
                 </a>
+                <a id="tab-test-failure" onclick="TestPageUpdater.showTab('test-failure', this);" class="tabnav-tab">
+                    <span class="octicon octicon-stop"></span>
+                    Test failure
+                </a>
             </nav>
         </div>
         <div class="columns border" id="test-history" style="margin-top: -16px">
@@ -64,7 +68,7 @@
                             <li id="start">Start datetime: </li>
                             <li id="finish">Finish datetime: </li>
                             <li id="duration">Duration: </li>
-                            <li id="message">Message: </li>
+                            <li style="white-space: pre-wrap" id="message">Message: </li>
                         </ul>
                     </div>
                 </div>
@@ -76,13 +80,24 @@
             </div>
         </div>
         <div class="columns border" id="test-output" style="margin-top: -16px; display: none">
-            <div class="two-thirds column">
+            <div class="column">
                 <h2 class="border-bottom p-3 mb-3">
                     Test output:
                 </h2>
-                <div id="test-output-string" style="white-space: pre-wrap">
-
-                </div>
+                <ul>
+                    <li id="test-output-string" style="white-space: pre-wrap"></li>
+                </ul>
+            </div>
+        </div>
+        <div class="columns border" id="test-failure" style="margin-top: -16px; display: none">
+            <div class="column">
+                <h2 class="border-bottom p-3 mb-3">
+                    Test failure:
+                </h2>
+                <ul>
+                    <li id="test-message" style="white-space: pre-wrap"></li>
+                    <li id="test-stack-trace" style="white-space: pre-wrap"></li>
+                </ul>
             </div>
         </div>
     </div>

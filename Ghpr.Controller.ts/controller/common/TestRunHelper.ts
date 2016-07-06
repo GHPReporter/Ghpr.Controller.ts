@@ -3,8 +3,8 @@
 ///<reference path="./Color.ts"/>
 
 class TestRunHelper {
-    static getColor(test: ITestRun): string {
-        const result = this.getResult(test);
+    static getColor(t: ITestRun): string {
+        const result = this.getResult(t);
         switch (result) {
             case TestResult.Passed:
                 return Color.passed;
@@ -21,29 +21,34 @@ class TestRunHelper {
         }
     }
 
-    static getResult(test: ITestRun): TestResult {
-        if (test.result.indexOf("Passed") > -1) {
+    static getResult(t: ITestRun): TestResult {
+        if (t.result.indexOf("Passed") > -1) {
             return TestResult.Passed;
         }
-        if (test.result.indexOf("Error") > -1) {
+        if (t.result.indexOf("Error") > -1) {
             return TestResult.Broken;
         }
-        if (test.result.indexOf("Failed") > -1 || test.result.indexOf("Failure") > -1) {
+        if (t.result.indexOf("Failed") > -1 || t.result.indexOf("Failure") > -1) {
             return TestResult.Failed;
         }
-        if (test.result.indexOf("Inconclusive") > -1) {
+        if (t.result.indexOf("Inconclusive") > -1) {
             return TestResult.Inconclusive;
         }
-        if (test.result.indexOf("Ignored") > -1 || test.result.indexOf("Skipped") > -1) {
+        if (t.result.indexOf("Ignored") > -1 || t.result.indexOf("Skipped") > -1) {
             return TestResult.Ignored;
         }
         return TestResult.Unknown;
     }
 
-    static getColoredResult(test: ITestRun): string {
-        return `<span class="p-1" style= "background-color: ${this.getColor(test)};" > ${test.result} </span>`;
+    static getColoredResult(t: ITestRun): string {
+        return `<span class="p-1" style= "background-color: ${this.getColor(t)};" > ${t.result} </span>`;
     }
-    static getMessage(test: ITestRun): string {
-        return test.testMessage === "" ? "-" : test.testMessage;
+
+    static getMessage(t: ITestRun): string {
+        return t.testMessage === "" ? "-" : t.testMessage;
+    }
+
+    static getStackTrace(t: ITestRun): string {
+        return t.testStackTrace === "" ? "-" : t.testStackTrace;
     }
 }
