@@ -17,7 +17,6 @@ class TestPageUpdater {
     static loader = new JsonLoader(PageType.TestPage);
 
     private static updateMainInformation(t: ITestRun): void {
-        console.log(t);
         document.getElementById("page-title").innerHTML = `<b>Test:</b> ${t.name}`;
         document.getElementById("name").innerHTML = `<b>Test name:</b> ${t.name}`;
         document.getElementById("full-name").innerHTML = `<b>Full name:</b> ${t.fullName}`;
@@ -111,7 +110,7 @@ class TestPageUpdater {
             this.updateMainInformation(test);
             this.updateOutput(test);
             this.updateFailure(test);
-            document.getElementById("btn-back").setAttribute("href", `./../runs/?runGuid=${test.runGuid}`);
+            document.getElementById("btn-back").setAttribute("href", `./../runs/index.html?runGuid=${test.runGuid}`);
             this.updateTestHistory();
         });
         return test;
@@ -142,7 +141,7 @@ class TestPageUpdater {
         
     }
 
-    private static loadTest(index: number = undefined): void {
+    private static loadTest(index: number): void {
         const guid = UrlHelper.getParam("testGuid");
         let testInfos: Array<IItemInfo>;
         this.loader.loadTestsJson(guid, (response: string) => {
@@ -183,7 +182,7 @@ class TestPageUpdater {
                 }
                 this.loadTest(index);
             } else {
-                this.loadTest();
+                this.loadTest(undefined);
             }
         });
     }
@@ -228,7 +227,7 @@ class TestPageUpdater {
 
     static loadLatest(): void {
         this.disableBtn("btn-next");
-        this.loadTest();
+        this.loadTest(undefined);
     }
 
     static initializePage(): void {

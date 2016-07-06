@@ -70,7 +70,7 @@ class RunPageUpdater {
         const c = tests.length;
         for (let i = 0; i < c; i++) {
             const t = tests[i];
-            list += `<li id=$test-${t.testInfo.guid}>Test #${c - i - 1}: <a href="./../tests/?testGuid=${t.testInfo.guid}&testFile=${t.testInfo.fileName}">${t.name}</a></li>`;
+            list += `<li id=$test-${t.testInfo.guid}>Test #${c - i - 1}: <a href="./../tests/index.html?testGuid=${t.testInfo.guid}&testFile=${t.testInfo.fileName}">${t.name}</a></li>`;
         }
         document.getElementById("all-tests").innerHTML = list;
     }
@@ -93,7 +93,7 @@ class RunPageUpdater {
         const testStrings: Array<string> = new Array();
         const tests: Array<ITestRun> = new Array();
 
-        document.getElementById("btn-back").setAttribute("href", `./../`);
+        document.getElementById("btn-back").setAttribute("href", `./../index.html`);
 
         const files = run.testRunFiles;
         for (let i = 0; i < files.length; i++) {
@@ -107,7 +107,7 @@ class RunPageUpdater {
         });
     }
 
-    private static loadRun(index: number = undefined): void {
+    private static loadRun(index: number): void {
         let runInfos: Array<IItemInfo>;
         this.loader.loadRunsJson((response: string) => {
             runInfos = JSON.parse(response, JsonLoader.reviveRun);
@@ -130,7 +130,7 @@ class RunPageUpdater {
     private static tryLoadRunByGuid(): void {
         const guid = UrlHelper.getParam("runGuid");
         if (guid === "") {
-            this.loadRun();
+            this.loadRun(undefined);
             return;
         }
         let runInfos: Array<IItemInfo>;
@@ -150,7 +150,7 @@ class RunPageUpdater {
                 }
                 this.loadRun(index);
             } else {
-                this.loadRun();
+                this.loadRun(undefined);
             }
         });
     }
@@ -195,7 +195,7 @@ class RunPageUpdater {
 
     static loadLatest(): void {
         this.disableBtn("btn-next");
-        this.loadRun();
+        this.loadRun(undefined);
     }
 
     static initializePage(): void {

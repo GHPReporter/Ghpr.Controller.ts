@@ -22,7 +22,7 @@ class ReportPageUpdater {
         const c = runs.length;
         for (let i = 0; i < c; i++) {
             const r = runs[i];
-            list += `<li id=$run-${r.runInfo.guid}>Run #${c-i-1}: <a href="./runs/?runGuid=${r.runInfo.guid}">${r.name}</a></li>`;
+            list += `<li id=$run-${r.runInfo.guid}>Run #${c - i - 1}: <a href="./runs/index.html?runGuid=${r.runInfo.guid}">${r.name}</a></li>`;
         }
         document.getElementById("all-runs").innerHTML = list;
     }
@@ -98,7 +98,7 @@ class ReportPageUpdater {
         });
     }
     
-    static updatePage(index: number = undefined): void {
+    static updatePage(index: number): void {
         let runInfos: Array<IItemInfo>;
         const paths: Array<string> = new Array();
         const r: Array<string> = new Array();
@@ -120,7 +120,7 @@ class ReportPageUpdater {
     }
     
     static initializePage(): void {
-        this.updatePage();
+        this.updatePage(undefined);
         this.showTab("runs-stats", document.getElementById("tab-runs-stats"));
     }
 

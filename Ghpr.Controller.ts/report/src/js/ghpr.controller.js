@@ -286,7 +286,7 @@ class RunPageUpdater {
         const c = tests.length;
         for (let i = 0; i < c; i++) {
             const t = tests[i];
-            list += `<li id=$test-${t.testInfo.guid}>Test #${c - i - 1}: <a href="./../tests/?testGuid=${t.testInfo.guid}&testFile=${t.testInfo.fileName}">${t.name}</a></li>`;
+            list += `<li id=$test-${t.testInfo.guid}>Test #${c - i - 1}: <a href="./../tests/index.html?testGuid=${t.testInfo.guid}&testFile=${t.testInfo.fileName}">${t.name}</a></li>`;
         }
         document.getElementById("all-tests").innerHTML = list;
     }
@@ -306,7 +306,7 @@ class RunPageUpdater {
         const paths = new Array();
         const testStrings = new Array();
         const tests = new Array();
-        document.getElementById("btn-back").setAttribute("href", `./../`);
+        document.getElementById("btn-back").setAttribute("href", `./../index.html`);
         const files = run.testRunFiles;
         for (let i = 0; i < files.length; i++) {
             paths[i] = `./../tests/${files[i]}`;
@@ -318,7 +318,7 @@ class RunPageUpdater {
             this.setTestsList(tests);
         });
     }
-    static loadRun(index = undefined) {
+    static loadRun(index) {
         let runInfos;
         this.loader.loadRunsJson((response) => {
             runInfos = JSON.parse(response, JsonLoader.reviveRun);
@@ -340,7 +340,7 @@ class RunPageUpdater {
     static tryLoadRunByGuid() {
         const guid = UrlHelper.getParam("runGuid");
         if (guid === "") {
-            this.loadRun();
+            this.loadRun(undefined);
             return;
         }
         let runInfos;
@@ -361,7 +361,7 @@ class RunPageUpdater {
                 this.loadRun(index);
             }
             else {
-                this.loadRun();
+                this.loadRun(undefined);
             }
         });
     }
@@ -402,7 +402,7 @@ class RunPageUpdater {
     }
     static loadLatest() {
         this.disableBtn("btn-next");
-        this.loadRun();
+        this.loadRun(undefined);
     }
     static initializePage() {
         this.tryLoadRunByGuid();
@@ -427,7 +427,7 @@ class ReportPageUpdater {
         const c = runs.length;
         for (let i = 0; i < c; i++) {
             const r = runs[i];
-            list += `<li id=$run-${r.runInfo.guid}>Run #${c - i - 1}: <a href="./runs/?runGuid=${r.runInfo.guid}">${r.name}</a></li>`;
+            list += `<li id=$run-${r.runInfo.guid}>Run #${c - i - 1}: <a href="./runs/index.html?runGuid=${r.runInfo.guid}">${r.name}</a></li>`;
         }
         document.getElementById("all-runs").innerHTML = list;
     }
@@ -492,7 +492,7 @@ class ReportPageUpdater {
             bargap: 0.01
         });
     }
-    static updatePage(index = undefined) {
+    static updatePage(index) {
         let runInfos;
         const paths = new Array();
         const r = new Array();
@@ -513,7 +513,7 @@ class ReportPageUpdater {
         });
     }
     static initializePage() {
-        this.updatePage();
+        this.updatePage(undefined);
         this.showTab("runs-stats", document.getElementById("tab-runs-stats"));
     }
     static showTab(idToShow, caller) {
@@ -573,7 +573,6 @@ class TestRunHelper {
 }
 class TestPageUpdater {
     static updateMainInformation(t) {
-        console.log(t);
         document.getElementById("page-title").innerHTML = `<b>Test:</b> ${t.name}`;
         document.getElementById("name").innerHTML = `<b>Test name:</b> ${t.name}`;
         document.getElementById("full-name").innerHTML = `<b>Full name:</b> ${t.fullName}`;
@@ -660,7 +659,7 @@ class TestPageUpdater {
             this.updateMainInformation(test);
             this.updateOutput(test);
             this.updateFailure(test);
-            document.getElementById("btn-back").setAttribute("href", `./../runs/?runGuid=${test.runGuid}`);
+            document.getElementById("btn-back").setAttribute("href", `./../runs/index.html?runGuid=${test.runGuid}`);
             this.updateTestHistory();
         });
         return test;
@@ -685,7 +684,7 @@ class TestPageUpdater {
             });
         });
     }
-    static loadTest(index = undefined) {
+    static loadTest(index) {
         const guid = UrlHelper.getParam("testGuid");
         let testInfos;
         this.loader.loadTestsJson(guid, (response) => {
@@ -726,7 +725,7 @@ class TestPageUpdater {
                 this.loadTest(index);
             }
             else {
-                this.loadTest();
+                this.loadTest(undefined);
             }
         });
     }
@@ -767,7 +766,7 @@ class TestPageUpdater {
     }
     static loadLatest() {
         this.disableBtn("btn-next");
-        this.loadTest();
+        this.loadTest(undefined);
     }
     static initializePage() {
         this.tryLoadTestByGuid();
