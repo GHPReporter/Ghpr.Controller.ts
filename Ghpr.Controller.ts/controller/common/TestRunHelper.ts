@@ -44,6 +44,10 @@ class TestRunHelper {
         return `<span class="p-1" style= "background-color: ${this.getColor(t)};" > ${t.result} </span>`;
     }
 
+    static getOutput(t: ITestRun): string {
+        return t.output === "" ? "-" : t.output;
+    }
+
     static getMessage(t: ITestRun): string {
         return t.testMessage === "" ? "-" : t.testMessage;
     }

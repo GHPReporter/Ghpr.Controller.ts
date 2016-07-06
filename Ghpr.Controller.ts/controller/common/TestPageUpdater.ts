@@ -29,7 +29,7 @@ class TestPageUpdater {
     }
 
     private static updateOutput(t: ITestRun): void {
-        document.getElementById("test-output-string").innerHTML = `<b>Test log:</b><br> ${t.output}`;
+        document.getElementById("test-output-string").innerHTML = `<b>Test log:</b><br> ${TestRunHelper.getOutput(t)}`;
     }
 
     private static updateFailure(t: ITestRun): void {

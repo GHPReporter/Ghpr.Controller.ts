@@ -561,6 +561,9 @@ class TestRunHelper {
     static getColoredResult(t) {
         return `<span class="p-1" style= "background-color: ${this.getColor(t)};" > ${t.result} </span>`;
     }
+    static getOutput(t) {
+        return t.output === "" ? "-" : t.output;
+    }
     static getMessage(t) {
         return t.testMessage === "" ? "-" : t.testMessage;
     }
@@ -581,7 +584,7 @@ class TestPageUpdater {
         document.getElementById("message").innerHTML = `<b>Message:</b> ${TestRunHelper.getMessage(t)}`;
     }
     static updateOutput(t) {
-        document.getElementById("test-output-string").innerHTML = `<b>Test log:</b><br> ${t.output}`;
+        document.getElementById("test-output-string").innerHTML = `<b>Test log:</b><br> ${TestRunHelper.getOutput(t)}`;
     }
     static updateFailure(t) {
         document.getElementById("test-message").innerHTML = `<b>Message:</b><br> ${TestRunHelper.getMessage(t)}`;
