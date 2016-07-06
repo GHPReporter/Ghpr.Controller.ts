@@ -39,43 +39,62 @@ class TestPageUpdater {
         const dataY: Array<number> = new Array();
         const tickvals: Array<number> = new Array();
         const ticktext: Array<string> = new Array();
+        const colors: Array<string> = new Array();
 
         const c = tests.length;
         for (let i = 0; i < c; i++) {
             const t = tests[i];
             dataX[i] = t.testInfo.finish;
+            colors[i] = TestRunHelper.getColor(t);
             const j = c - i - 1;
             dataY[i] = t.duration;
             tickvals[i] = j;
             ticktext[i] = `test ${j}`;
         }
-        const ty = "scatter";
-        const hi = "y";
-        plotlyData = [
-            {
-                x: dataX,
-                y: dataY,
-                name: "Test history",
-                type: ty,
-                hoverinfo: hi,
-                marker: {
-                    color: [Color.unknown, Color.failed, Color.passed],
-                    size: 25,
-                    line: {
-                        color: Color.unknown,
-                        width: 4
-                    }
-                },
-                mode: "lines+markers",
-                line: {
-                    shape: "spline",
-                    color: Color.unknown,
-                    width: 8
-                }
+        const historyTrace = {
+            x: dataX,
+            y: dataY,
+            name: "Test history",
+            hoverinfo: "x",
+            type: "scatter",
+            showlegend: false,
+            marker: {
+                color: colors,
+                size: 25,
+                line: { color: Color.unknown, width: 4 }
+            },
+            mode: "lines+markers",
+            line: { shape: "spline", color: Color.unknown, width: 8 },
+            textfont: { family: "Helvetica, arial, sans-serif" }
+        };
+        const index = this.currentTest;
+        const currentTest = {
+            x: [dataX[index]],
+            y: [dataY[index]],
+            name: "Current test: ",
+            type: "scatter",
+            mode: "markers",
+            hoverinfo: "name",
+            showlegend: false,
+            marker: {
+                color: [TestRunHelper.getColor(tests[index])],
+                size: 40,
+                line: { color: Color.unknown, width: 8 }
             }
-        ];
+        };
+        plotlyData = [historyTrace, currentTest];
         
-        Plotly.newPlot(historyDiv, plotlyData, {});      
+        const layout = {
+            title: "Test history",
+            xaxis: {
+                title: "Finish datetime"
+            },
+            yaxis: {
+                title: "Test duration (sec.)"
+            }
+        };
+
+        Plotly.newPlot(historyDiv, plotlyData, layout);      
     }
 
     private static updateTestPage(testGuid: string, fileName: string): ITestRun {
@@ -85,6 +104,7 @@ class TestPageUpdater {
             UrlHelper.insertParam("testGuid", test.testInfo.guid);
             UrlHelper.insertParam("testFile", test.testInfo.fileName);
             this.updateMainInformation(test);
+            this.updateOutput(test);
             document.getElementById("btn-back").setAttribute("href", `./../runs/?runGuid=${test.runGuid}`);
             this.updateTestHistory();
         });
