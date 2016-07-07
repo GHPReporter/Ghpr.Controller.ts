@@ -21,9 +21,12 @@ class TestPageUpdater {
         document.getElementById("name").innerHTML = `<b>Test name:</b> ${t.name}`;
         document.getElementById("full-name").innerHTML = `<b>Full name:</b> ${t.fullName}`;
         document.getElementById("result").innerHTML = `<b>Result:</b> ${TestRunHelper.getColoredResult(t)}`;
+        document.getElementById("priority").innerHTML = `<b>Priority:</b> ${t.priority}`;
+        document.getElementById("test-type").innerHTML = `<b>Test type:</b> ${t.testType}`;
         document.getElementById("start").innerHTML = `<b>Start datetime:</b> ${DateFormatter.format(t.testInfo.start)}`;
         document.getElementById("finish").innerHTML = `<b>Finish datetime:</b> ${DateFormatter.format(t.testInfo.finish)}`;
         document.getElementById("duration").innerHTML = `<b>Duration:</b> ${t.duration.toString()}`;
+        document.getElementById("categories").innerHTML = `<b>Categories:</b> ${TestRunHelper.getCategories(t)}`;
         document.getElementById("message").innerHTML = `<b>Message:</b> ${TestRunHelper.getMessage(t)}`;
     }
 

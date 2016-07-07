@@ -13,10 +13,12 @@ interface ITestRun {
     result: string;
     output: string;
     runGuid: string;
+    testType: string;
+    priority: string;
+    categories: Array<string>;
     screenshots: Array<ITestScreenshot>;
     events: Array<ITestEvent>;
 
     testRunColor: string;
     testResult: TestResult;
-    failedOrBroken: boolean;
 }

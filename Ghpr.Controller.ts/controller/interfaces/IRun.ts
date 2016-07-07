@@ -6,4 +6,5 @@ interface IRun {
     runInfo: IItemInfo;
     summary: IRunSummary;
     name: string;
+    sprint: string;
 }

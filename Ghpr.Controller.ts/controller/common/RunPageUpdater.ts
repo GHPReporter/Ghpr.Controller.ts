@@ -15,7 +15,9 @@ class RunPageUpdater {
     static runsCount: number; 
     static loader = new JsonLoader(PageType.TestRunPage);
 
-    private static updateTime(run: IRun): void {
+    private static updateRunInformation(run: IRun): void {
+        document.getElementById("name").innerHTML = `<b>Run name:</b> ${run.name}`;
+        document.getElementById("sprint").innerHTML = `<b>Sprint:</b> ${run.sprint}`;
         document.getElementById("start").innerHTML = `<b>Start datetime:</b> ${DateFormatter.format(run.runInfo.start)}`;
         document.getElementById("finish").innerHTML = `<b>Finish datetime:</b> ${DateFormatter.format(run.runInfo.finish)}`;
         document.getElementById("duration").innerHTML = `<b>Duration:</b> ${DateFormatter.diff(run.runInfo.start, run.runInfo.finish)}`;
@@ -80,7 +82,7 @@ class RunPageUpdater {
         this.loader.loadRunJson(runGuid, (response: string) => {
             run = JSON.parse(response, JsonLoader.reviveRun);
             UrlHelper.insertParam("runGuid", run.runInfo.guid);
-            this.updateTime(run);
+            RunPageUpdater.updateRunInformation(run);
             this.updateSummary(run);
             RunPageUpdater.updateTitle(run);
             this.updateTestsList(run);
