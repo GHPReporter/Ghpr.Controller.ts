@@ -123,7 +123,6 @@ class TestPageUpdater {
         const paths: Array<string> = new Array();
         const testStrings: Array<string> = new Array();
         const tests: Array<ITestRun> = new Array();
-
         const guid = UrlHelper.getParam("testGuid");
         let testInfos: Array<IItemInfo>;
         this.loader.loadTestsJson(guid, (response: string) => {
@@ -240,7 +239,7 @@ class TestPageUpdater {
         this.showTab(tab === "" ? "test-history" : tab, document.getElementById(`tab-${tab}`));
     }
 
-    private static runPageTabsIds: Array<string> = ["test-history", "test-output", "test-failure"];
+    private static runPageTabsIds: Array<string> = ["test-history", "test-output", "test-failure", "test-screenshots"];
 
     static showTab(idToShow: string, caller: HTMLElement): void {
         TabsHelper.showTab(idToShow, caller, this.runPageTabsIds);

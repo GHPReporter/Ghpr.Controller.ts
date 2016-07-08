@@ -46,11 +46,15 @@
                 </a>
                 <a id="tab-test-output" onclick="TestPageUpdater.showTab('test-output', this);" class="tabnav-tab">
                     <span class="octicon octicon-file-text"></span>
-                    Test output
+                    Output
                 </a>
                 <a id="tab-test-failure" onclick="TestPageUpdater.showTab('test-failure', this);" class="tabnav-tab">
                     <span class="octicon octicon-stop"></span>
-                    Test failure
+                    Failure
+                </a>
+                <a id="tab-test-screenshots" onclick="TestPageUpdater.showTab('test-screenshots', this);" class="tabnav-tab">
+                    <span class="octicon octicon-device-desktop"></span>
+                    Screenshots
                 </a>
             </nav>
         </div>
@@ -100,6 +104,16 @@
                 <ul>
                     <li id="test-message" style="white-space: pre-wrap"></li>
                     <li id="test-stack-trace" style="white-space: pre-wrap"></li>
+                </ul>
+            </div>
+        </div>
+        <div class="columns border" id="test-screenshots" style="margin-top: -16px; display: none">
+            <div class="column">
+                <h2 class="border-bottom p-3 mb-3">
+                    Test screenshots:
+                </h2>
+                <ul>
+                    <li id="screenshots"></li>
                 </ul>
             </div>
         </div>

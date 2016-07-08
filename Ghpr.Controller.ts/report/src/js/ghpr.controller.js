@@ -787,7 +787,7 @@ class TestPageUpdater {
     }
 }
 TestPageUpdater.loader = new JsonLoader(PageType.TestPage);
-TestPageUpdater.runPageTabsIds = ["test-history", "test-output", "test-failure"];
+TestPageUpdater.runPageTabsIds = ["test-history", "test-output", "test-failure", "test-screenshots"];
 class Sorter {
     static itemInfoSorterByFinishDateFunc(a, b) {
         if (a.finish > b.finish) {

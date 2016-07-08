@@ -55,6 +55,7 @@ class TestRunHelper {
     static getStackTrace(t: ITestRun): string {
         return t.testStackTrace === "" ? "-" : t.testStackTrace;
     }
+
     static getCategories(t: ITestRun): string {
         return t.categories.length <= 0 ? "-" : t.categories.join(", ");
     }
