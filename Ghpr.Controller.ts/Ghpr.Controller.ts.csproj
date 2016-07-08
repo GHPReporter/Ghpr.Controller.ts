@@ -24,9 +24,7 @@
   <ItemGroup>
     <Content Include="index.html" />
     <Content Include="report\index.html" />
-    <Content Include="report\runs\index.html">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <Content Include="report\runs\index.html" />
     <Content Include="report\src\js\ghpr.controller.js" />
     <Content Include="report\src\js\jquery-1.11.0.min.js" />
     <Content Include="report\src\js\plotly.min.js" />
